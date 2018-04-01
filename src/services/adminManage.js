@@ -2,27 +2,27 @@ import { stringify } from 'qs';
 import request from '../utils/request';
 import { apiPrefix } from '../utils/appConfig';
 
-/** 部门 RESTful 接口 */
-export async function queryStaff(params) {
-  return request(`${apiPrefix}/api/staff?${stringify(params)}`);
+/** 管理员 RESTful 接口 */
+export async function queryAdmin(params) {
+  return request(`${apiPrefix}/api/admin?${stringify(params)}`);
 }
 
-export async function updateStaff(params) {
-  return request(`${apiPrefix}/api/staff/${params.id}`, {
+export async function updateAdmin(params) {
+  return request(`${apiPrefix}/api/admin/${params.id}`, {
     method: 'PUT',
     body: params,
   });
 }
 
-export async function createStaff(params) {
-  return request(`${apiPrefix}/api/staff`, {
+export async function createAdmin(params) {
+  return request(`${apiPrefix}/api/admin`, {
     method: 'POST',
     body: params,
   });
 }
 
-export async function deleteStaff(params) {
-  return request(`${apiPrefix}/api/staff/${params.id}`, {
+export async function deleteAdmin(params) {
+  return request(`${apiPrefix}/api/admin/${params.id}`, {
     method: 'DELETE',
   });
 }

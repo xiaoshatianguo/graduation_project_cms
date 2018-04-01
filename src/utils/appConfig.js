@@ -4,9 +4,9 @@
 
 /* 程序调用接口的前缀 */
 // TODO: 更改接口服务器地址
-export const apiPrefix = 'http://39.108.75.149:7001'; // 测试服地址
+// export const apiPrefix = 'http://39.108.75.149:7001'; // 测试服地址
 // export const apiPrefix = 'http://120.76.189.133:7001'; // 正式服地址
-// export const apiPrefix = '';
+export const apiPrefix = 'http://127.0.0.1:7001';
 
 /* 异步请求接口超时的时长，以秒作为单位 */
 export const timeout = '30';

@@ -1,23 +1,23 @@
 const menuData = [
-  {
-    name: '账户',
-    icon: 'user',
-    path: 'user',
-    children: [
-      {
-        name: '登录',
-        path: 'login',
-      },
-      {
-        name: '注册',
-        path: 'register',
-      },
-      {
-        name: '注册结果',
-        path: 'register-result',
-      },
-    ],
-  },
+  // {
+  //   name: '账户',
+  //   icon: 'user',
+  //   path: 'user',
+  //   children: [
+  //     {
+  //       name: '登录',
+  //       path: 'login',
+  //     },
+  //     {
+  //       name: '注册',
+  //       path: 'register',
+  //     },
+  //     {
+  //       name: '注册结果',
+  //       path: 'register-result',
+  //     },
+  //   ],
+  // },
   {
     name: '管理员',
     icon: 'book',
