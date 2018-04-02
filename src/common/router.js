@@ -92,7 +92,7 @@ export const getRouterData = (app) => {
     '/user/register-result': {
       component: dynamicWrapper(app, [], () => import('../routes/User/RegisterResult')),
     },
-    '/admin-manage': {
+    '/admin': {
       component: dynamicWrapper(app, [], () => import('../routes/AdminManage/AdminManage')),
     },
     '/activity-manage/info': {

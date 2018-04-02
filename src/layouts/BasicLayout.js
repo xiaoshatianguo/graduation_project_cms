@@ -178,7 +178,7 @@ class BasicLayout extends React.PureComponent {
                 {redirectData.map(item => (
                   <Redirect key={item.from} exact from={item.from} to={item.to} />
                 ))}
-                <Redirect exact from="/" to="/" />
+                <Redirect exact from="/" to="/admin" />
                 <Route render={NotFound} />
               </Switch>
             </div>

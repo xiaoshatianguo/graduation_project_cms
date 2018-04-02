@@ -84,7 +84,7 @@ export default class GlobalHeader extends PureComponent {
           onClick={this.toggle}
         />
         <div className={styles.right}>
-          {/* <HeaderSearch
+          <HeaderSearch
             className={`${styles.action} ${styles.search}`}
             placeholder="站内搜索"
             dataSource={['搜索提示一', '搜索提示二', '搜索提示三']}
@@ -94,8 +94,8 @@ export default class GlobalHeader extends PureComponent {
             onPressEnter={(value) => {
               console.log('enter', value); // eslint-disable-line
             }}
-          /> */}
-          {/* <NoticeIcon
+          />
+          <NoticeIcon
             className={styles.action}
             count={currentUser.notifyCount}
             onItemClick={(item, tabProps) => {
@@ -124,15 +124,15 @@ export default class GlobalHeader extends PureComponent {
               emptyText="你已完成所有待办"
               emptyImage="https://gw.alipayobjects.com/zos/rmsportal/HsIsxMZiWKrNUavQUXqx.svg"
             />
-          </NoticeIcon> */}
-          {/* {currentUser.name ? (
+          </NoticeIcon>
+          {currentUser.name ? (
             <Dropdown overlay={menu}>
               <span className={`${styles.action} ${styles.account}`}>
                 <Avatar size="small" className={styles.avatar} src={currentUser.avatar} />
                 <span className={styles.name}>{currentUser.name}</span>
               </span>
             </Dropdown>
-          ) : <Spin size="small" style={{ marginLeft: 8 }} />} */}
+          ) : <Spin size="small" style={{ marginLeft: 8 }} />}
         </div>
       </Header>
     );

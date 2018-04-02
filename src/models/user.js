@@ -5,7 +5,7 @@ export default {
 
   state: {
     list: [],
-    // currentUser: {},
+    currentUser: {},
   },
 
   effects: {
@@ -16,13 +16,13 @@ export default {
         payload: response,
       });
     },
-    // *fetchCurrent(_, { call, put }) {
-    //   const response = yield call(queryCurrent);
-    //   yield put({
-    //     type: 'saveCurrentUser',
-    //     payload: response,
-    //   });
-    // },
+    *fetchCurrent(_, { call, put }) {
+      const response = yield call(queryCurrent);
+      yield put({
+        type: 'saveCurrentUser',
+        payload: response,
+      });
+    },
   },
 
   reducers: {
@@ -32,20 +32,20 @@ export default {
         list: action.payload,
       };
     },
-    // saveCurrentUser(state, action) {
-    //   return {
-    //     ...state,
-    //     currentUser: action.payload,
-    //   };
-    // },
-    // changeNotifyCount(state, action) {
-    //   return {
-    //     ...state,
-    //     currentUser: {
-    //       ...state.currentUser,
-    //       notifyCount: action.payload,
-    //     },
-    //   };
-    // },
+    saveCurrentUser(state, action) {
+      return {
+        ...state,
+        currentUser: action.payload,
+      };
+    },
+    changeNotifyCount(state, action) {
+      return {
+        ...state,
+        currentUser: {
+          ...state.currentUser,
+          notifyCount: action.payload,
+        },
+      };
+    },
   },
 };

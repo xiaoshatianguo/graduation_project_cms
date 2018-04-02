@@ -21,8 +21,9 @@ import { qiniuDomain } from '../../utils/appConfig';
 
 const FormItem = Form.Item;
 
-@connect(({ admin }) => ({
+@connect(({ admin, loading }) => ({
   admin,
+  loading: loading.models.admin,
 }))
 
 @Form.create()
