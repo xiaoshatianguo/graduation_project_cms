@@ -1,5 +1,5 @@
 import { createElement } from 'react';
-import dynamic from 'dva/dynamic';
+import dynamic from 'dva/dynamic';  // 异步路由
 import { getMenuData } from './menu';
 
 let routerDataCache;
@@ -93,39 +93,39 @@ export const getRouterData = (app) => {
       component: dynamicWrapper(app, [], () => import('../routes/User/RegisterResult')),
     },
     '/admin': {
-      component: dynamicWrapper(app, [], () => import('../routes/AdminManage/AdminManage')),
+      component: dynamicWrapper(app, ['admin'], () => import('../routes/Admin/AdminManage')),
     },
-    '/activity-manage/info': {
-      component: dynamicWrapper(app, [], () => import('../routes/ActivityManage/Info'),
+    '/activity/info': {
+      component: dynamicWrapper(app, ['activity'], () => import('../routes/Activity/ActivityInfo'),
       ),
     },
-    '/activity-manage/checked': {
-      component: dynamicWrapper(app, [], () => import('../routes/ActivityManage/Checked'),
+    '/activity/checked': {
+      component: dynamicWrapper(app, ['activity'], () => import('../routes/Activity/ActivityChecked'),
       ),
     },
     '/members': {
-      component: dynamicWrapper(app, [], () => import('../routes/Members/Members')),
+      component: dynamicWrapper(app, ['members'], () => import('../routes/Members/Members')),
     },
     '/certified-architect/info': {
-      component: dynamicWrapper(app, [], () => import('../routes/CertifiedArchitect/Info')),
+      component: dynamicWrapper(app, ['certifiedArchitect'], () => import('../routes/CertifiedArchitect/CertifiedArchitectInfo')),
     },
     '/certified-architect/checked': {
-      component: dynamicWrapper(app, [], () => import('../routes/CertifiedArchitect/Checked')),
+      component: dynamicWrapper(app, ['certifiedArchitect'], () => import('../routes/CertifiedArchitect/CertifiedArchitectChecked')),
     },
-    '/production-manage/info': {
-      component: dynamicWrapper(app, [], () => import('../routes/ProductionManage/Info')),
+    '/production/info': {
+      component: dynamicWrapper(app, ['production'], () => import('../routes/Production/ProductionInfo')),
     },
-    '/production-manage/checked': {
-      component: dynamicWrapper(app, [], () => import('../routes/ProductionManage/Checked')),
+    '/production/checked': {
+      component: dynamicWrapper(app, ['production'], () => import('../routes/Production/ProductionChecked')),
     },
-    '/comments-manage/comments': {
-      component: dynamicWrapper(app, [], () => import('../routes/CommentsManage/Comments')),
+    '/comments/comments': {
+      component: dynamicWrapper(app, ['comments'], () => import('../routes/Comments/Comments')),
     },
-    '/comments-manage/massage': {
-      component: dynamicWrapper(app, [], () => import('../routes/CommentsManage/Massage')),
+    '/comments/massage': {
+      component: dynamicWrapper(app, ['comments'], () => import('../routes/Comments/Massage')),
     },
-    '/attention-manage': {
-      component: dynamicWrapper(app, [], () => import('../routes/AttentionManage/AttentionManage'),
+    '/attention': {
+      component: dynamicWrapper(app, ['attention'], () => import('../routes/Attention/Attention'),
       ),
     },
   };

@@ -1,12 +1,12 @@
 import {
-    queryBlogArticles,
-    updateBlogArticles,
-    createBlogArticles,
-    deleteBlogArticles,
-  } from '../services/attentionManage';
+    queryAttention,
+    updateAttention,
+    createAttention,
+    deleteAttention,
+  } from '../services/attention';
   
   export default {
-    namespace: 'article',
+    namespace: 'attention',
   
     state: {
       data: {},

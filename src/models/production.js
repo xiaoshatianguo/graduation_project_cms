@@ -1,11 +1,11 @@
 /**
- *  管理员
+ *  帮助中心模型
  */
 
-import { queryAdmin, updateAdmin, createAdmin, deleteAdmin } from '../services/adminManage';
+import { queryStaff, updateStaff, createStaff, deleteStaff } from '../services/production';
 
 export default {
-  namespace: 'admin',
+  namespace: 'production',
 
   state: {
     data: {},
@@ -15,21 +15,21 @@ export default {
 
   effects: {
     *fetch({ payload }, { call, put }) {
-      const response = yield call(queryAdmin, payload);
+      const response = yield call(queryStaff, payload);
       yield put({
         type: 'save',
         payload: response,
       });
     },
     *put({ payload }, { call, put }) {
-      const response = yield call(updateAdmin, payload);
+      const response = yield call(updateStaff, payload);
       yield put({
         type: 'updete',
         payload: response,
       });
     },
     *add({ payload }, { call, put }) {
-      const response = yield call(createAdmin, payload);
+      const response = yield call(createStaff, payload);
       // type: 'append' 与 *add 不能重名，会触发重复的接口请求
       yield put({
         type: 'append',
@@ -37,7 +37,7 @@ export default {
       });
     },
     *delete({ payload }, { call }) {
-      yield call(deleteAdmin, payload);
+      yield call(deleteStaff, payload);
     },
   },
 

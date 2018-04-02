@@ -26,28 +26,3 @@ export async function deleteCase(params) {
     method: 'DELETE',
   });
 }
-
-/** 普通案例 RESTful 接口 */
-export async function queryCommonCase(params) {
-  return request(`${apiPrefix}/api/common_case?${stringify(params)}`);
-}
-
-export async function updateCommonCase(params) {
-  return request(`${apiPrefix}/api/common_case/${params.id}`, {
-    method: 'PUT',
-    body: params,
-  });
-}
-
-export async function createCommonCase(params) {
-  return request(`${apiPrefix}/api/common_case`, {
-    method: 'POST',
-    body: params,
-  });
-}
-
-export async function deleteCommonCase(params) {
-  return request(`${apiPrefix}/api/common_case/${params.id}`, {
-    method: 'DELETE',
-  });
-}

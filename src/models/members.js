@@ -5,7 +5,7 @@
 import { queryStaff, updateStaff, createStaff, deleteStaff } from '../services/members';
 
 export default {
-  namespace: 'staff',
+  namespace: 'members',
 
   state: {
     data: {},

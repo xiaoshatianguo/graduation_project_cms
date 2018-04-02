@@ -1,11 +1,7 @@
-/**
- *  帮助中心模型
- */
-
-import { queryStaff, updateStaff, createStaff, deleteStaff } from '../services/productionManage';
+import { queryCase, updateCase, createCase, deleteCase } from '../services/activity';
 
 export default {
-  namespace: 'staff',
+  namespace: 'activity',
 
   state: {
     data: {},
@@ -15,21 +11,21 @@ export default {
 
   effects: {
     *fetch({ payload }, { call, put }) {
-      const response = yield call(queryStaff, payload);
+      const response = yield call(queryCase, payload);
       yield put({
         type: 'save',
         payload: response,
       });
     },
     *put({ payload }, { call, put }) {
-      const response = yield call(updateStaff, payload);
+      const response = yield call(updateCase, payload);
       yield put({
         type: 'updete',
         payload: response,
       });
     },
     *add({ payload }, { call, put }) {
-      const response = yield call(createStaff, payload);
+      const response = yield call(createCase, payload);
       // type: 'append' 与 *add 不能重名，会触发重复的接口请求
       yield put({
         type: 'append',
@@ -37,7 +33,7 @@ export default {
       });
     },
     *delete({ payload }, { call }) {
-      yield call(deleteStaff, payload);
+      yield call(deleteCase, payload);
     },
   },
 

@@ -27,7 +27,7 @@ const menuData = [
   {
     name: '活动管理',
     icon: 'android',
-    path: 'activity-manage',
+    path: 'activity',
     children: [
       {
         name: '活动信息',

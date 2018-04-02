@@ -25,12 +25,12 @@ const FormItem = Form.Item;
 const { TextArea } = Input;
 const fileListKeys = ['cover', 'mobile_cover', 'icon', 'banner', 'mobile_banner', 'qrcode'];
 
-@connect(({ projectCase, loading }) => ({
+@connect(({ activity, loading }) => ({
   projectCase,
   loading: loading.models.projectCase,
 }))
 @Form.create()
-export class Info extends Component {
+export class ActivityInfo extends Component {
   state = {
     tableData: [],
     modalVisible: false,
@@ -624,4 +624,4 @@ export class Info extends Component {
   }
 }
 
-export default Info;
+export default ActivityInfo;

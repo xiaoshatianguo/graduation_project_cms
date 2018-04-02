@@ -27,7 +27,7 @@ const FormItem = Form.Item;
   loading: loading.models.staff,
 }))
 @Form.create()
-export class Checked extends Component {
+export class CertifiedArchitectChecked extends Component {
   state = {
     tableData: [],
     modalVisible: false,
@@ -444,4 +444,4 @@ export class Checked extends Component {
   }
 }
 
-export default Checked;
+export default CertifiedArchitectChecked;

@@ -6,10 +6,10 @@ import {
     queryFormManage,
     updateFormManage,
     deleteFormManage,
-  } from '../services/commentsManage';
+  } from '../services/comments';
   
 export default {
-    namespace: 'formManage',
+    namespace: 'comments',
   
     state: {
       data: {},

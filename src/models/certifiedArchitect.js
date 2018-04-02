@@ -5,7 +5,7 @@
 import { queryStaff, updateStaff, createStaff, deleteStaff } from '../services/certifiedArchitect';
 
 export default {
-  namespace: 'staff',
+  namespace: 'certifiedArchitect',
 
   state: {
     data: {},

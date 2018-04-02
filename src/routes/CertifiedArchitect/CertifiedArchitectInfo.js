@@ -8,12 +8,11 @@ import {
   Input,
   Table,
   Popconfirm,
-  InputNumber,
   Modal,
   Form,
   message,
-  Tooltip,
-  Icon,
+  Avatar,
+  Select,
 } from 'antd';
 import moment from 'moment';
 import PageHeaderLayout from '../../layouts/PageHeaderLayout';
@@ -21,76 +20,75 @@ import UploadImgs from '../../components/UploadImgs/UploadImgs';
 import { qiniuDomain } from '../../utils/appConfig';
 
 const FormItem = Form.Item;
-const { TextArea } = Input;
 
-@connect(({ article, loading }) => ({
-  article,
-  loading: loading.models.article,
+@connect(({ staff, loading, department }) => ({
+  staff,
+  department,
+  loading: loading.models.staff,
 }))
 @Form.create()
-export class AttentionManage extends Component {
+export class CertifiedArchitectInfo extends Component {
   state = {
     tableData: [],
     modalVisible: false,
     editFormTitle: '',
 
     id: '', // 表格数据
-    title: '', // 表格数据
-    author: '', // 表格数据--作者
-    mainbody: '', // 表格数据--富文本正文
-    defaultFileList: [], // 表格数据--展示已经上传的封面
-    defaultSelectCover: [], // 表格数据--展示已经上传的精选封面
-    articleSearch: '', // 文章搜索标题
+    name: '',
+    post: '',
+    photo: '',
+    departmentID: '', // 表格数据--所属部门
+    department: '',
+    real_name: '',
+
+    titleSearch: '', // 员工搜索标题
     editFormFlag: '', // 信息框的标记，add--添加，update--更新
     tableCurIndex: '', // 当前编辑的行数
     currentPage: 1, // 当前页数
     curPageSize: 10, // 当前页面的条数
 
+    department: [], // 后台获取的部门列表
   };
 
   componentDidMount = () => {
     const { currentPage, curPageSize } = this.state;
 
     this.props.dispatch({
-      type: 'article/fetch',
+      type: 'staff/fetch',
       payload: {
         currentPage,
         curPageSize,
       },
     });
+
+    this.props.dispatch({
+      type: 'department/fetch',
+    });
   };
 
   componentWillReceiveProps = (nextProps) => {
-    const { data } = nextProps.article;
+    const { data } = nextProps.staff;
     const { content = [], totalElements } = data;
 
     this.setState({
       tableData: content,
       tableDataTotal: totalElements,
+      department: nextProps.department.data,
     });
   };
 
   handleRowEditClick = (index, record) => {
-    const { id = -1, title, author, mainbody, cover, selectCover } = record;
+    const { id = -1, name, post, photo, department, real_name } = record;
+    this.tableCurIndex = index;
 
     const defaultFileList = [];
-    const defaultSelectCover = [];
 
-    if (cover) {
+    if (photo) {
       defaultFileList.push({
-        uid: cover,
-        picname: `p-${cover}.png`,
+        uid: photo,
+        picname: `p-${photo}.png`,
         status: 'done',
-        url: cover,
-      });
-    }
-
-    if (selectCover) {
-      defaultSelectCover.push({
-        uid: selectCover,
-        picname: `p-${selectCover}.png`,
-        status: 'done',
-        url: selectCover,
+        url: photo,
       });
     }
 
@@ -99,23 +97,23 @@ export class AttentionManage extends Component {
       modalVisible: true,
       editFormTitle: record.title,
       defaultFileList,
-      defaultSelectCover,
       editFormFlag: 'update',
       tableCurIndex: index,
+      departmentID: department,
     });
 
     this.props.form.setFieldsValue({
-      title,
-      author,
-      mainbody,
-      cover,
-      selectCover,
+      name,
+      post,
+      photo,
+      department,
+      real_name,
     });
   };
 
   handleRowDeleteClick = async (id, index, record) => {
     await this.props.dispatch({
-      type: 'article/delete',
+      type: 'staff/delete',
       payload: {
         id,
       },
@@ -128,15 +126,15 @@ export class AttentionManage extends Component {
       tableData,
     });
 
-    message.info(`《${record.title}》已删除 ☠️`);
+    message.info(`《${record.name}》已删除 ☠️`);
   };
 
   handleSetBannerWeight = async (value, recode) => {
     await this.props.dispatch({
-      type: 'article/put',
+      type: 'staff/put',
       payload: {
         id: recode.id,
-        set_banner: value,
+        weight: value,
       },
     });
 
@@ -147,8 +145,7 @@ export class AttentionManage extends Component {
     this.setState({
       modalVisible: flag,
       editFormFlag: 'add',
-      editFormTitle: '新增文章',
-      defaultSelectCover: [],
+      editFormTitle: '新增条目',
       defaultFileList: [],
     });
 
@@ -156,7 +153,7 @@ export class AttentionManage extends Component {
   };
 
   /**
-   * 表单提交事件，判断是创建文章还是更新文章，分别调用 create 方法和 update 方法
+   * 表单提交事件，判断是创建员工还是更新员工，分别调用 create 方法和 update 方法
    */
   handleSubmit = (e) => {
     e.preventDefault();
@@ -166,13 +163,13 @@ export class AttentionManage extends Component {
       if (!err) {
         if (editFormFlag === 'add') {
           await this.props.dispatch({
-            type: 'article/add',
+            type: 'staff/add',
             payload: values,
           });
           this.handleSucceedAdd();
         } else if (editFormFlag === 'update') {
           await this.props.dispatch({
-            type: 'article/put',
+            type: 'staff/put',
             payload: {
               id,
               ...values,
@@ -185,12 +182,12 @@ export class AttentionManage extends Component {
   };
 
   /**
-   * 文章增加成功之后的处理方法，将文章插入到表格最前面
+   * 员工增加成功之后的处理方法，将员工插入到表格最前面
    */
   handleSucceedAdd = () => {
     const { tableData } = this.state;
 
-    tableData.unshift(this.props.article.append);
+    tableData.unshift(this.props.staff.append);
 
     this.setState({
       tableDataTotal: this.state.tableDataTotal + 1,
@@ -201,12 +198,12 @@ export class AttentionManage extends Component {
     this.handleModalVisible(false);
   };
   /**
-   * 文章增加更新之后的处理方法，直接修改文章列表对应数据
+   * 员工增加更新之后的处理方法，直接修改员工列表对应数据
    */
   handleSucceedUpdate = () => {
     const { tableData, tableCurIndex } = this.state;
 
-    tableData[tableCurIndex] = this.props.article.updete;
+    tableData[tableCurIndex] = this.props.staff.updete;
 
     this.setState({ tableData });
     this.handleModalVisible(false);
@@ -238,7 +235,7 @@ export class AttentionManage extends Component {
     const { curPageSize } = this.state;
 
     this.props.dispatch({
-      type: 'article/fetch',
+      type: 'staff/fetch',
       payload: {
         currentPage: current,
         curPageSize,
@@ -251,15 +248,32 @@ export class AttentionManage extends Component {
   render() {
     const columns = [
       {
-        title: '标题',
+        title: '照片',
         className: 'ant-tableThead',
-        dataIndex: 'title',
+        dataIndex: 'photo',
+        render: (text) => {
+          return <Avatar shape="square" src={text} size="large" />;
+        },
       },
       {
-        title: '作者',
+        title: '昵称',
         className: 'ant-tableThead',
-        dataIndex: 'author',
-        width: 100,
+        dataIndex: 'name',
+      },
+      {
+        title: '真实姓名',
+        className: 'ant-tableThead',
+        dataIndex: 'real_name',
+      },
+      {
+        title: '岗位',
+        className: 'ant-tableThead',
+        dataIndex: 'post',
+      },
+      {
+        title: '部门',
+        className: 'ant-tableThead',
+        dataIndex: 'sort_name',
       },
       {
         title: '创建时间',
@@ -268,21 +282,6 @@ export class AttentionManage extends Component {
         width: 160,
         render: (text) => {
           return <span>{moment(text).format('YYYY-MM-DD')}</span>;
-        },
-      },
-      {
-        title: 'Banner权重',
-        className: 'ant-tableThead',
-        dataIndex: 'set_banner',
-        render: (text, record) => {
-          return (
-            <InputNumber
-              defaultValue={text}
-              min={0}
-              max={100}
-              onChange={value => this.handleSetBannerWeight(value, record)}
-            />
-          );
         },
       },
       {
@@ -342,17 +341,18 @@ export class AttentionManage extends Component {
       currentPage,
       curPageSize,
       tableDataTotal,
+      department,
     } = this.state;
 
     return (
       <PageHeaderLayout
-        title="博客文章"
-        content="博客文章用户在博客页面中展示，单篇文章点击可跳转至文章详情。"
+        title="员工管理"
+        content="在 “关于我们” 子页面中可以看到各个部门的员工， 请确保真实姓名是正确的，会和案例页面中的员工名字相关联。"
       >
         <Card>
           <Row gutter={24}>
-            <Col span={2}>
-              <h4>标题：</h4>
+            <Col span={4}>
+              <h4>员工标题：</h4>
             </Col>
             <Col span={4}>
               <Input />
@@ -360,9 +360,9 @@ export class AttentionManage extends Component {
             <Col span={8}>
               <Button icon="search">查询</Button>
             </Col>
-            <Col span={4} offset={4}>
+            <Col span={4} offset={2}>
               <Button type="primary" icon="plus" onClick={() => this.handleModalVisible(true)}>
-                新增文章
+                新增员工
               </Button>
             </Col>
           </Row>
@@ -386,59 +386,54 @@ export class AttentionManage extends Component {
         <Modal
           title={editFormTitle}
           visible={modalVisible}
-          width={800}
+          width={600}
           onOk={this.handleSubmit}
           onCancel={() => this.handleModalVisible(false)}
-          confirmLoading={loading}
         >
           <Form onSubmit={this.handleSubmit} width={800}>
-            <FormItem {...formItemLayout} label="标题">
-              {getFieldDecorator('title', {
+            <FormItem {...formItemLayout} label="昵称">
+              {getFieldDecorator('name', {
                 rules: customRules,
-                initialValue: this.state.title,
-              })(<Input placeholder="请输入文章标题" />)}
+                initialValue: this.state.name,
+              })(<Input />)}
             </FormItem>
 
-            <FormItem {...formItemLayout} label="作者">
-              {getFieldDecorator('author', {
+            <FormItem {...formItemLayout} label="真实姓名">
+              {getFieldDecorator('real_name', {
                 rules: customRules,
-                initialValue: this.state.author,
-              })(<Input placeholder="请输入文章作者" />)}
+                initialValue: this.state.real_name,
+              })(<Input />)}
             </FormItem>
 
-            <FormItem {...formItemLayout} label="文章正文">
-              {getFieldDecorator('mainbody', {
+            <FormItem {...formItemLayout} label="岗位">
+              {getFieldDecorator('post', {
                 rules: customRules,
-                initialValue: this.state.mainbody,
+                initialValue: this.state.post,
+              })(<Input placeholder="产品经理" />)}
+            </FormItem>
+
+            <FormItem {...formItemLayout} label="部门">
+              {getFieldDecorator('department', {
+                rules: customRules,
+                initialValue: this.state.departmentID,
               })(
-                <TextArea
-                  placeholder="请录入 MarkDown 格式的文章正文"
-                  autosize={{ minRows: 6, maxRows: 20 }}
-                />
+                <Select>
+                  {department.map(item => (
+                    <Select.Option key={item.id} value={item.id}>
+                      {item.sort_name}
+                    </Select.Option>
+                  ))}
+                </Select>
               )}
             </FormItem>
 
-            <FormItem {...formItemLayout} label="封面">
-              {getFieldDecorator('cover', {
-                // rules: customRules,
-                // initialValue: this.state.cover,
-              })(
+            <FormItem {...formItemLayout} label="照片">
+              {getFieldDecorator('photo', { rules: customRules })(
                 <UploadImgs
                   isEnhanceSingle
                   limit={1}
                   defaultFileList={this.state.defaultFileList}
-                  handleUploadChange={fileList => this.handleUploadChange(fileList, 'cover')}
-                />
-              )}
-            </FormItem>
-
-            <FormItem {...formItemLayout} label={(<span>精选封面&nbsp;<Tooltip title="若不上传，则默认使用普通案例封面; 上传则优先使用精选封面"><Icon type="info-circle-o" /></Tooltip></span>)}>
-              {getFieldDecorator('selectCover', {})(
-                <UploadImgs
-                  isEnhanceSingle
-                  limit={1}
-                  defaultFileList={this.state.defaultSelectCover}
-                  handleUploadChange={fileList => this.handleUploadChange(fileList, 'selectCover')}
+                  handleUploadChange={fileList => this.handleUploadChange(fileList, 'photo')}
                 />
               )}
             </FormItem>
@@ -449,4 +444,4 @@ export class AttentionManage extends Component {
   }
 }
 
-export default AttentionManage;
+export default CertifiedArchitectInfo;

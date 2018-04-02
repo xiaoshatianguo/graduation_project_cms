@@ -21,96 +21,101 @@ import { qiniuDomain } from '../../utils/appConfig';
 
 const FormItem = Form.Item;
 
-@connect(({ admin, loading }) => ({
-  admin,
-  loading: loading.models.admin,
+@connect(({ staff, loading, department }) => ({
+  staff,
+  department,
+  loading: loading.models.staff,
 }))
-
 @Form.create()
-export class AdminManage extends Component {
+export class ProductionInfo extends Component {
   state = {
     tableData: [],
     modalVisible: false,
     editFormTitle: '',
 
-    uuid: '', // 表格数据
-    number: '',
-    nick_name: '',
-    password: '',
-    sex: '',
-    integral: '',
-    create_time: '',
-    lastest_login_time: '',
-    manage_categories: '',
-    status: '',
+    id: '', // 表格数据
+    name: '',
+    post: '',
+    photo: '',
+    departmentID: '', // 表格数据--所属部门
+    department: '',
+    real_name: '',
 
+    titleSearch: '', // 员工搜索标题
     editFormFlag: '', // 信息框的标记，add--添加，update--更新
     tableCurIndex: '', // 当前编辑的行数
     currentPage: 1, // 当前页数
     curPageSize: 10, // 当前页面的条数
+
+    department: [], // 后台获取的部门列表
   };
 
   componentDidMount = () => {
     const { currentPage, curPageSize } = this.state;
 
     this.props.dispatch({
-      type: 'admin/fetch',
+      type: 'staff/fetch',
       payload: {
         currentPage,
         curPageSize,
       },
     });
+
+    this.props.dispatch({
+      type: 'department/fetch',
+    });
   };
 
-  // componentWillReceiveProps = (nextProps) => {
-  //   const { data } = nextProps.admin;
-  //   const { content = [], totalElements } = data;
+  componentWillReceiveProps = (nextProps) => {
+    const { data } = nextProps.staff;
+    const { content = [], totalElements } = data;
 
-  //   this.setState({
-  //     tableData: content,
-  //     tableDataTotal: totalElements,
-  //   });
-  // };
+    this.setState({
+      tableData: content,
+      tableDataTotal: totalElements,
+      department: nextProps.department.data,
+    });
+  };
 
   handleRowEditClick = (index, record) => {
-    const { uuid = -1, nick_name, password, sex, integral, manage_categories, status } = record;
+    const { id = -1, name, post, photo, department, real_name } = record;
     this.tableCurIndex = index;
 
     const defaultFileList = [];
 
-    // if (photo) {
-    //   defaultFileList.push({
-    //     uid: photo,
-    //     picname: `p-${photo}.png`,
-    //     status: 'done',
-    //     url: photo,
-    //   });
-    // }
+    if (photo) {
+      defaultFileList.push({
+        uid: photo,
+        picname: `p-${photo}.png`,
+        status: 'done',
+        url: photo,
+      });
+    }
 
     this.setState({
-      uuid,
+      id,
       modalVisible: true,
       editFormTitle: record.title,
       defaultFileList,
       editFormFlag: 'update',
       tableCurIndex: index,
+      departmentID: department,
     });
 
     this.props.form.setFieldsValue({
-      nick_name,
-      password,
-      sex,
-      integral,
-      manage_categories,
-      status
+      name,
+      post,
+      photo,
+      department,
+      real_name,
     });
   };
 
-  handleRowDeleteClick = async (uuid, index, record) => {
+  handleRowDeleteClick = async (id, index, record) => {
     await this.props.dispatch({
-      type: 'admin/delete',
+      type: 'staff/delete',
       payload: {
-        uuid,
+        id,
       },
     });
 
@@ -121,20 +126,20 @@ export class AdminManage extends Component {
       tableData,
     });
 
-    message.info(`《${record.number}${record.nick_name}》已删除 ☠️`);
+    message.info(`《${record.name}》已删除 ☠️`);
   };
 
-  // handleSetBannerWeight = async (value, recode) => {
-  //   await this.props.dispatch({
-  //     type: 'admin/put',
-  //     payload: {
-  //       id: recode.id,
-  //       weight: value,
-  //     },
-  //   });
+  handleSetBannerWeight = async (value, recode) => {
+    await this.props.dispatch({
+      type: 'staff/put',
+      payload: {
+        id: recode.id,
+        weight: value,
+      },
+    });
 
-  //   message.success('知错能改，善莫大焉 🛠 ');
-  // };
+    message.success('知错能改，善莫大焉 🛠 ');
+  };
 
   handleModalVisible = (flag) => {
     this.setState({
@@ -148,25 +153,25 @@ export class AdminManage extends Component {
   };
 
   /**
-   * 表单提交事件，判断是创建管理员还是更新管理员，分别调用 create 方法和 update 方法
+   * 表单提交事件，判断是创建员工还是更新员工，分别调用 create 方法和 update 方法
    */
   handleSubmit = (e) => {
     e.preventDefault();
-    const { editFormFlag, uuid } = this.state;
+    const { editFormFlag, id } = this.state;
 
     this.props.form.validateFieldsAndScroll(async (err, values) => {
       if (!err) {
         if (editFormFlag === 'add') {
           await this.props.dispatch({
-            type: 'admin/add',
+            type: 'staff/add',
             payload: values,
           });
           this.handleSucceedAdd();
         } else if (editFormFlag === 'update') {
           await this.props.dispatch({
-            type: 'admin/put',
+            type: 'staff/put',
             payload: {
-              uuid,
+              id,
               ...values,
             },
           });
@@ -177,12 +182,12 @@ export class AdminManage extends Component {
   };
 
   /**
-   * 管理员增加成功之后的处理方法，将管理员插入到表格最前面
+   * 员工增加成功之后的处理方法，将员工插入到表格最前面
    */
   handleSucceedAdd = () => {
     const { tableData } = this.state;
 
-    tableData.unshift(this.props.admin.append);
+    tableData.unshift(this.props.staff.append);
 
     this.setState({
       tableDataTotal: this.state.tableDataTotal + 1,
@@ -193,12 +198,12 @@ export class AdminManage extends Component {
     this.handleModalVisible(false);
   };
   /**
-   * 管理员增加更新之后的处理方法，直接修改管理员列表对应数据
+   * 员工增加更新之后的处理方法，直接修改员工列表对应数据
    */
   handleSucceedUpdate = () => {
     const { tableData, tableCurIndex } = this.state;
 
-    tableData[tableCurIndex] = this.props.admin.updete;
+    tableData[tableCurIndex] = this.props.staff.updete;
 
     this.setState({ tableData });
     this.handleModalVisible(false);
@@ -210,15 +215,15 @@ export class AdminManage extends Component {
    * @param  {object} [fileList]       文件数据对象数组
    * @param  {string} tag     图片上传组件对应的表单字段
    */
-  // handleUploadChange = (fileList, tag) => {
-  //   const valueObj = {};
+  handleUploadChange = (fileList, tag) => {
+    const valueObj = {};
 
-  //   if (fileList.length > 0) {
-  //     const imageURL = `${qiniuDomain}/${fileList[0].response.key}`;
-  //     valueObj[tag] = imageURL;
-  //     this.props.form.setFieldsValue(valueObj);
-  //   }
-  // };
+    if (fileList.length > 0) {
+      const imageURL = `${qiniuDomain}/${fileList[0].response.key}`;
+      valueObj[tag] = imageURL;
+      this.props.form.setFieldsValue(valueObj);
+    }
+  };
 
   /**
    * 表格分页改变相应事件
@@ -230,7 +235,7 @@ export class AdminManage extends Component {
     const { curPageSize } = this.state;
 
     this.props.dispatch({
-      type: 'admin/fetch',
+      type: 'staff/fetch',
       payload: {
         currentPage: current,
         curPageSize,
@@ -243,48 +248,37 @@ export class AdminManage extends Component {
   render() {
     const columns = [
       {
-        title: '编号',
+        title: '照片',
         className: 'ant-tableThead',
-        dataIndex: 'number',
+        dataIndex: 'photo',
+        render: (text) => {
+          return <Avatar shape="square" src={text} size="large" />;
+        },
       },
       {
         title: '昵称',
         className: 'ant-tableThead',
-        dataIndex: 'nick_name',
+        dataIndex: 'name',
       },
       {
-        title: '密码',
+        title: '真实姓名',
         className: 'ant-tableThead',
-        dataIndex: 'password',
+        dataIndex: 'real_name',
       },
       {
-        title: '性别',
+        title: '岗位',
         className: 'ant-tableThead',
-        dataIndex: 'sex',
+        dataIndex: 'post',
       },
       {
-        title: '权限',
+        title: '部门',
         className: 'ant-tableThead',
-        dataIndex: 'integral',
-      },
-      {
-        title: '管理类别',
-        className: 'ant-tableThead',
-        dataIndex: 'manage_categories',
+        dataIndex: 'sort_name',
       },
       {
         title: '创建时间',
         className: 'ant-tableThead',
         dataIndex: 'create_time',
-        width: 160,
-        render: (text) => {
-          return <span>{moment(text).format('YYYY-MM-DD')}</span>;
-        },
-      },
-      {
-        title: '最后登录时间',
-        className: 'ant-tableThead',
-        dataIndex: 'Lastest_login_time',
         width: 160,
         render: (text) => {
           return <span>{moment(text).format('YYYY-MM-DD')}</span>;
@@ -347,33 +341,28 @@ export class AdminManage extends Component {
       currentPage,
       curPageSize,
       tableDataTotal,
+      department,
     } = this.state;
 
     return (
       <PageHeaderLayout
-        title="管理员"
-        content="分配不同类别的管理员"
+        title="员工管理"
+        content="在 “关于我们” 子页面中可以看到各个部门的员工， 请确保真实姓名是正确的，会和案例页面中的员工名字相关联。"
       >
         <Card>
           <Row gutter={24}>
-            <Col span={3}>
-              <h4>管理员编号：</h4>
+            <Col span={4}>
+              <h4>员工标题：</h4>
             </Col>
             <Col span={4}>
               <Input />
             </Col>
-            <Col span={3}>
-              <h4>管理员昵称：</h4>
-            </Col>
-            <Col span={4}>
-              <Input />
-            </Col>
-            <Col span={2}>
+            <Col span={8}>
               <Button icon="search">查询</Button>
             </Col>
             <Col span={4} offset={2}>
               <Button type="primary" icon="plus" onClick={() => this.handleModalVisible(true)}>
-                新增管理员
+                新增员工
               </Button>
             </Col>
           </Row>
@@ -382,7 +371,7 @@ export class AdminManage extends Component {
         <Row>
           <Table
             columns={columns}
-            rowKey={record => record.uuid || 0}
+            rowKey={record => record.id || 0}
             dataSource={this.state.tableData}
             loading={loading}
             pagination={{
@@ -402,49 +391,28 @@ export class AdminManage extends Component {
           onCancel={() => this.handleModalVisible(false)}
         >
           <Form onSubmit={this.handleSubmit} width={800}>
-            <FormItem {...formItemLayout} label="编号">
-              {getFieldDecorator('number', {
-                rules: customRules,
-                initialValue: this.state.number,
-              })(<Input />)}
-            </FormItem>
-
             <FormItem {...formItemLayout} label="昵称">
-              {getFieldDecorator('nick_name', {
+              {getFieldDecorator('name', {
                 rules: customRules,
-                initialValue: this.state.nick_name,
+                initialValue: this.state.name,
               })(<Input />)}
             </FormItem>
 
-            <FormItem {...formItemLayout} label="密码">
-              {getFieldDecorator('password', {
+            <FormItem {...formItemLayout} label="真实姓名">
+              {getFieldDecorator('real_name', {
+                rules: customRules,
+                initialValue: this.state.real_name,
+              })(<Input />)}
+            </FormItem>
+
+            <FormItem {...formItemLayout} label="岗位">
+              {getFieldDecorator('post', {
                 rules: customRules,
                 initialValue: this.state.post,
-              })(<Input />)}
+              })(<Input placeholder="产品经理" />)}
             </FormItem>
 
-            <FormItem {...formItemLayout} label="性别">
-              {getFieldDecorator('sex', {
-                rules: customRules,
-                initialValue: this.state.sex,
-              })(<Input />)}
-            </FormItem>
-
-            <FormItem {...formItemLayout} label="权限">
-              {getFieldDecorator('integral', {
-                rules: customRules,
-                initialValue: this.state.integral,
-              })(<Input />)}
-            </FormItem>
-
-            <FormItem {...formItemLayout} label="管理类别">
-              {getFieldDecorator('manage_categories', {
-                rules: customRules,
-                initialValue: this.state.manage_categories,
-              })(<Input />)}
-            </FormItem>
-
-            {/* <FormItem {...formItemLayout} label="部门">
+            <FormItem {...formItemLayout} label="部门">
               {getFieldDecorator('department', {
                 rules: customRules,
                 initialValue: this.state.departmentID,
@@ -457,9 +425,9 @@ export class AdminManage extends Component {
                   ))}
                 </Select>
               )}
-            </FormItem> */}
+            </FormItem>
 
-            {/* <FormItem {...formItemLayout} label="照片">
+            <FormItem {...formItemLayout} label="照片">
               {getFieldDecorator('photo', { rules: customRules })(
                 <UploadImgs
                   isEnhanceSingle
@@ -468,7 +436,7 @@ export class AdminManage extends Component {
                   handleUploadChange={fileList => this.handleUploadChange(fileList, 'photo')}
                 />
               )}
-            </FormItem> */}
+            </FormItem>
           </Form>
         </Modal>
       </PageHeaderLayout>
@@ -476,4 +444,4 @@ export class AdminManage extends Component {
   }
 }
 
-export default AdminManage;
+export default ProductionInfo;

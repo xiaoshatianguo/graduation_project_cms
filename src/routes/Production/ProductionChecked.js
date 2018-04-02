@@ -27,7 +27,7 @@ const FormItem = Form.Item;
   loading: loading.models.staff,
 }))
 @Form.create()
-export class Info extends Component {
+export class ProductionChecked extends Component {
   state = {
     tableData: [],
     modalVisible: false,
@@ -444,4 +444,4 @@ export class Info extends Component {
   }
 }
 
-export default Info;
+export default ProductionChecked;

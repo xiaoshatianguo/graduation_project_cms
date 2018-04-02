@@ -28,7 +28,7 @@ const { TextArea } = Input;
   loading: loading.models.article,
 }))
 @Form.create()
-export class Checked extends Component {
+export class Attention extends Component {
   state = {
     tableData: [],
     modalVisible: false,
@@ -449,4 +449,4 @@ export class Checked extends Component {
   }
 }
 
-export default Checked;
+export default Attention;
