@@ -4,7 +4,7 @@ import { apiPrefix } from '../utils/appConfig';
 
 /** 管理员 RESTful 接口 */
 export async function queryAdmin(params) {
-  return request(`${apiPrefix}/api/admin?${stringify(params)}`);
+  return request(`${apiPrefix}/api/admin`);
 }
 
 export async function updateAdmin(params) {

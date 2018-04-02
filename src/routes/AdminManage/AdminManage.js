@@ -44,7 +44,6 @@ export class AdminManage extends Component {
     manage_categories: '',
     status: '',
 
-    titleSearch: '', // 员工搜索标题
     editFormFlag: '', // 信息框的标记，add--添加，update--更新
     tableCurIndex: '', // 当前编辑的行数
     currentPage: 1, // 当前页数

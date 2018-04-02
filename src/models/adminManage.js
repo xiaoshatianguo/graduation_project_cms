@@ -1,5 +1,5 @@
 /**
- *  帮助中心模型
+ *  管理员
  */
 
 import { queryAdmin, updateAdmin, createAdmin, deleteAdmin } from '../services/adminManage';
