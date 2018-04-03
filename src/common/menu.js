@@ -64,7 +64,7 @@ const menuData = [
   {
     name: '作品管理',
     icon: 'profile',
-    path: '/production-manage',
+    path: '/production',
     children: [
       {
         name: '作品信息',
@@ -79,7 +79,7 @@ const menuData = [
   {
     name: '评论留言管理',
     icon: 'bulb',
-    path: '/comments-manage',
+    path: '/comments',
     children: [
       {
         name: '评论管理',
@@ -94,7 +94,7 @@ const menuData = [
   {
     name: '点赞关注相关',
     icon: 'form',
-    path: '/attention-manage',
+    path: '/attention',
   },
 ];
 

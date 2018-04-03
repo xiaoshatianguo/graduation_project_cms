@@ -21,13 +21,14 @@ import { qiniuDomain } from '../../utils/appConfig';
 
 const FormItem = Form.Item;
 
-@connect(({ Admin, loading }) => ({
-  Admin,
-  loading: loading.models.Admin,
+// 连接model层的state数据，然后通过this.props.state名(namespace)访问model层的state数据
+@connect(({ admin, loading }) => ({
+  admin,
+  loading: loading.models.admin,
 }))
 
 @Form.create()
-export class Admin extends Component {
+export class AdminManage extends Component {
   state = {
     tableData: [],
     modalVisible: false,
@@ -62,15 +63,14 @@ export class Admin extends Component {
     });
   };
 
-  // componentWillReceiveProps = (nextProps) => {
-  //   const { data } = nextProps.admin;
-  //   const { content = [], totalElements } = data;
-
-  //   this.setState({
-  //     tableData: content,
-  //     tableDataTotal: totalElements,
-  //   });
-  // };
+  componentWillReceiveProps = (nextProps) => {
+    const { data } = nextProps.admin;
+    const { content = [], totalElements } = data;
+    this.setState({
+      tableData: content,
+      tableDataTotal: totalElements,
+    });
+  };
 
   handleRowEditClick = (index, record) => {
     const { uuid = -1, nick_name, password, sex, integral, manage_categories, status } = record;
@@ -241,6 +241,7 @@ export class Admin extends Component {
   };
 
   render() {
+    console.log(this.state.tableData);
     const columns = [
       {
         title: '编号',
@@ -284,7 +285,7 @@ export class Admin extends Component {
       {
         title: '最后登录时间',
         className: 'ant-tableThead',
-        dataIndex: 'Lastest_login_time',
+        dataIndex: 'lastest_login_time',
         width: 160,
         render: (text) => {
           return <span>{moment(text).format('YYYY-MM-DD')}</span>;
@@ -476,4 +477,4 @@ export class Admin extends Component {
   }
 }
 
-export default Admin;
+export default AdminManage;
