@@ -1,8 +1,8 @@
 /**
- *  帮助中心模型
+ *  认证师模型
  */
 
-import { queryStaff, updateStaff, createStaff, deleteStaff } from '../services/certifiedArchitect';
+import { queryCertifiedArchitect, updateCertifiedArchitect, createCertifiedArchitect, deleteCertifiedArchitect } from '../services/certifiedArchitect';
 
 export default {
   namespace: 'certifiedArchitect',
@@ -15,21 +15,21 @@ export default {
 
   effects: {
     *fetch({ payload }, { call, put }) {
-      const response = yield call(queryStaff, payload);
+      const response = yield call(queryCertifiedArchitect, payload);
       yield put({
         type: 'save',
         payload: response,
       });
     },
     *put({ payload }, { call, put }) {
-      const response = yield call(updateStaff, payload);
+      const response = yield call(updateCertifiedArchitect, payload);
       yield put({
         type: 'updete',
         payload: response,
       });
     },
     *add({ payload }, { call, put }) {
-      const response = yield call(createStaff, payload);
+      const response = yield call(createCertifiedArchitect, payload);
       // type: 'append' 与 *add 不能重名，会触发重复的接口请求
       yield put({
         type: 'append',
@@ -37,7 +37,7 @@ export default {
       });
     },
     *delete({ payload }, { call }) {
-      yield call(deleteStaff, payload);
+      yield call(deleteCertifiedArchitect, payload);
     },
   },
 

@@ -1,28 +1,28 @@
 import { stringify } from 'qs';
-import request from '../utils/request';
 import { apiPrefix } from '../utils/appConfig';
+import request from '../utils/request';
 
-/** 部门 RESTful 接口 */
-export async function queryStaff(params) {
-  return request(`${apiPrefix}/api/staff?${stringify(params)}`);
+/** 项目案例 RESTful 接口 */
+export async function queryCertifiedArchitect(params) {
+  return request(`${apiPrefix}/api/certified_architect?${stringify(params)}`);
 }
 
-export async function updateStaff(params) {
-  return request(`${apiPrefix}/api/staff/${params.id}`, {
+export async function updateCertifiedArchitect(params) {
+  return request(`${apiPrefix}/api/certified_architect/${params.id}`, {
     method: 'PUT',
     body: params,
   });
 }
 
-export async function createStaff(params) {
-  return request(`${apiPrefix}/api/staff`, {
+export async function createCertifiedArchitect(params) {
+  return request(`${apiPrefix}/api/certified_architect`, {
     method: 'POST',
     body: params,
   });
 }
 
-export async function deleteStaff(params) {
-  return request(`${apiPrefix}/api/staff/${params.id}`, {
+export async function deleteCertifiedArchitect(params) {
+  return request(`${apiPrefix}/api/certified_architect/${params.id}`, {
     method: 'DELETE',
   });
 }

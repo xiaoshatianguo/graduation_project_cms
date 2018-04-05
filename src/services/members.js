@@ -2,7 +2,7 @@ import { stringify } from 'qs';
 import request from '../utils/request';
 import { apiPrefix } from '../utils/appConfig';
 
-/** 管理员 RESTful 接口 */
+/** 用户、认证师 RESTful 接口 */
 export async function queryUser(params) {
   return request(`${apiPrefix}/api/user`);
 }

@@ -1,5 +1,5 @@
 /**
- *  管理员
+ *  用户
  */
 
 import { queryUser, updateUser, createUser, deleteUser } from '../services/members';
