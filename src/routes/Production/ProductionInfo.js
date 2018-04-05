@@ -8,11 +8,13 @@ import {
   Input,
   Table,
   Popconfirm,
+  InputNumber,
   Modal,
   Form,
-  message,
-  Avatar,
   Select,
+  message,
+  Tooltip,
+  Icon,
 } from 'antd';
 import moment from 'moment';
 import PageHeaderLayout from '../../layouts/PageHeaderLayout';
@@ -20,12 +22,13 @@ import UploadImgs from '../../components/UploadImgs/UploadImgs';
 import { qiniuDomain } from '../../utils/appConfig';
 
 const FormItem = Form.Item;
+const { TextArea } = Input;
 
-@connect(({ staff, loading, department }) => ({
-  staff,
-  department,
-  loading: loading.models.staff,
+@connect(({ production, loading }) => ({
+  production,
+  loading: loading.models.production,
 }))
+
 @Form.create()
 export class ProductionInfo extends Component {
   state = {
@@ -33,87 +36,72 @@ export class ProductionInfo extends Component {
     modalVisible: false,
     editFormTitle: '',
 
-    id: '', // 表格数据
+    number: '',
     name: '',
-    post: '',
-    photo: '',
-    departmentID: '', // 表格数据--所属部门
-    department: '',
-    real_name: '',
+    author: '',
+    sort: '',
+    describe: '',
+    content: '',
 
-    titleSearch: '', // 员工搜索标题
     editFormFlag: '', // 信息框的标记，add--添加，update--更新
     tableCurIndex: '', // 当前编辑的行数
     currentPage: 1, // 当前页数
     curPageSize: 10, // 当前页面的条数
-
-    department: [], // 后台获取的部门列表
   };
 
   componentDidMount = () => {
     const { currentPage, curPageSize } = this.state;
 
     this.props.dispatch({
-      type: 'staff/fetch',
+      type: 'production/fetch',
       payload: {
         currentPage,
         curPageSize,
       },
     });
-
-    this.props.dispatch({
-      type: 'department/fetch',
-    });
   };
 
   componentWillReceiveProps = (nextProps) => {
-    const { data } = nextProps.staff;
+    const { data } = nextProps.production;
     const { content = [], totalElements } = data;
 
-    this.setState({
-      tableData: content,
-      tableDataTotal: totalElements,
-      department: nextProps.department.data,
-    });
+    this.setState({ tableData: content, tableDataTotal: totalElements });
   };
 
   handleRowEditClick = (index, record) => {
-    const { id = -1, name, post, photo, department, real_name } = record;
+    const {
+      id = -1,
+      number,
+      name,
+      author,
+      sort,
+      describe,
+      content,
+    } = record;
+
     this.tableCurIndex = index;
-
-    const defaultFileList = [];
-
-    if (photo) {
-      defaultFileList.push({
-        uid: photo,
-        picname: `p-${photo}.png`,
-        status: 'done',
-        url: photo,
-      });
-    }
 
     this.setState({
       id,
       modalVisible: true,
-      editFormTitle: record.title,
-      defaultFileList,
+      editFormTitle: '编辑信息',
       editFormFlag: 'update',
       tableCurIndex: index,
-      departmentID: department,
     });
 
     this.props.form.setFieldsValue({
+      number,
       name,
-      post,
-      photo,
-      department,
-      real_name,
+      author,
+      sort,
+      describe,
+      content,
     });
   };
 
   handleRowDeleteClick = async (id, index, record) => {
     await this.props.dispatch({
-      type: 'staff/delete',
+      type: 'production/delete',
       payload: {
         id,
       },
@@ -129,31 +117,19 @@ export class ProductionInfo extends Component {
     message.info(`《${record.name}》已删除 ☠️`);
   };
 
-  handleSetBannerWeight = async (value, recode) => {
-    await this.props.dispatch({
-      type: 'staff/put',
-      payload: {
-        id: recode.id,
-        weight: value,
-      },
-    });
-
-    message.success('知错能改，善莫大焉 🛠 ');
-  };
-
   handleModalVisible = (flag) => {
     this.setState({
       modalVisible: flag,
       editFormFlag: 'add',
-      editFormTitle: '新增条目',
-      defaultFileList: [],
+      editFormTitle: '新增作品',
+      defaultFileListObj: {},
     });
-
+    
     this.props.form.resetFields();
   };
 
   /**
-   * 表单提交事件，判断是创建员工还是更新员工，分别调用 create 方法和 update 方法
+   * 表单提交事件，判断是创建项目还是更新项目，分别调用 create 方法和 update 方法
    */
   handleSubmit = (e) => {
     e.preventDefault();
@@ -163,13 +139,13 @@ export class ProductionInfo extends Component {
       if (!err) {
         if (editFormFlag === 'add') {
           await this.props.dispatch({
-            type: 'staff/add',
+            type: 'production/add',
             payload: values,
           });
           this.handleSucceedAdd();
         } else if (editFormFlag === 'update') {
           await this.props.dispatch({
-            type: 'staff/put',
+            type: 'production/put',
             payload: {
               id,
               ...values,
@@ -182,12 +158,12 @@ export class ProductionInfo extends Component {
   };
 
   /**
-   * 员工增加成功之后的处理方法，将员工插入到表格最前面
+   * 项目增加成功之后的处理方法，将项目插入到表格最前面
    */
   handleSucceedAdd = () => {
     const { tableData } = this.state;
 
-    tableData.unshift(this.props.staff.append);
+    tableData.unshift(this.props.production.append);
 
     this.setState({
       tableDataTotal: this.state.tableDataTotal + 1,
@@ -196,33 +172,21 @@ export class ProductionInfo extends Component {
     });
 
     this.handleModalVisible(false);
+
+    message.info(`新增作品成功`);
   };
   /**
-   * 员工增加更新之后的处理方法，直接修改员工列表对应数据
+   * 项目增加更新之后的处理方法，直接修改项目列表对应数据
    */
   handleSucceedUpdate = () => {
     const { tableData, tableCurIndex } = this.state;
 
-    tableData[tableCurIndex] = this.props.staff.updete;
+    tableData[tableCurIndex] = this.props.production.updete;
 
     this.setState({ tableData });
     this.handleModalVisible(false);
-  };
 
-  /**
-   * 处理图片上传组件成功上传之后返回的数据
-   *
-   * @param  {object} [fileList]       文件数据对象数组
-   * @param  {string} tag     图片上传组件对应的表单字段
-   */
-  handleUploadChange = (fileList, tag) => {
-    const valueObj = {};
-
-    if (fileList.length > 0) {
-      const imageURL = `${qiniuDomain}/${fileList[0].response.key}`;
-      valueObj[tag] = imageURL;
-      this.props.form.setFieldsValue(valueObj);
-    }
+    message.info(`作品信息已更新`);
   };
 
   /**
@@ -235,7 +199,7 @@ export class ProductionInfo extends Component {
     const { curPageSize } = this.state;
 
     this.props.dispatch({
-      type: 'staff/fetch',
+      type: 'production/fetch',
       payload: {
         currentPage: current,
         curPageSize,
@@ -248,38 +212,39 @@ export class ProductionInfo extends Component {
   render() {
     const columns = [
       {
-        title: '照片',
+        title: '编号',
         className: 'ant-tableThead',
-        dataIndex: 'photo',
-        render: (text) => {
-          return <Avatar shape="square" src={text} size="large" />;
-        },
+        dataIndex: 'number',
       },
       {
-        title: '昵称',
+        title: '作品名称',
         className: 'ant-tableThead',
         dataIndex: 'name',
       },
       {
-        title: '真实姓名',
+        title: '作者',
         className: 'ant-tableThead',
-        dataIndex: 'real_name',
+        dataIndex: 'author',
       },
       {
-        title: '岗位',
+        title: '分类',
         className: 'ant-tableThead',
-        dataIndex: 'post',
+        dataIndex: 'sort',
       },
       {
-        title: '部门',
+        title: '描述',
         className: 'ant-tableThead',
-        dataIndex: 'sort_name',
+        dataIndex: 'describe',
+      },
+      {
+        title: '内容',
+        className: 'ant-tableThead',
+        dataIndex: 'content',
       },
       {
         title: '创建时间',
         className: 'ant-tableThead',
         dataIndex: 'create_time',
-        width: 160,
         render: (text) => {
           return <span>{moment(text).format('YYYY-MM-DD')}</span>;
         },
@@ -318,7 +283,7 @@ export class ProductionInfo extends Component {
     const formItemLayout = {
       labelCol: {
         xs: { span: 24 },
-        sm: { span: 4 },
+        sm: { span: 5 },
       },
       wrapperCol: {
         xs: { span: 24 },
@@ -335,24 +300,16 @@ export class ProductionInfo extends Component {
     ];
 
     const { loading } = this.props;
-    const {
-      modalVisible,
-      editFormTitle,
-      currentPage,
-      curPageSize,
-      tableDataTotal,
-      department,
-    } = this.state;
-
+    const { modalVisible, editFormTitle, currentPage, curPageSize, tableDataTotal } = this.state;
     return (
       <PageHeaderLayout
-        title="员工管理"
-        content="在 “关于我们” 子页面中可以看到各个部门的员工， 请确保真实姓名是正确的，会和案例页面中的员工名字相关联。"
+        title="作品管理"
+        content="管理已经用户和认证师的作品。"
       >
         <Card>
           <Row gutter={24}>
-            <Col span={4}>
-              <h4>员工标题：</h4>
+            <Col span={2}>
+              <h4>作品名称：</h4>
             </Col>
             <Col span={4}>
               <Input />
@@ -360,9 +317,9 @@ export class ProductionInfo extends Component {
             <Col span={8}>
               <Button icon="search">查询</Button>
             </Col>
-            <Col span={4} offset={2}>
+            <Col span={4} offset={4}>
               <Button type="primary" icon="plus" onClick={() => this.handleModalVisible(true)}>
-                新增员工
+                新增作品
               </Button>
             </Col>
           </Row>
@@ -386,56 +343,51 @@ export class ProductionInfo extends Component {
         <Modal
           title={editFormTitle}
           visible={modalVisible}
-          width={600}
+          width={800}
           onOk={this.handleSubmit}
           onCancel={() => this.handleModalVisible(false)}
         >
           <Form onSubmit={this.handleSubmit} width={800}>
-            <FormItem {...formItemLayout} label="昵称">
+            <FormItem {...formItemLayout} label="编号">
+              {getFieldDecorator('number', {
+                rules: customRules,
+                initialValue: this.state.number,
+              })(<Input />)}
+            </FormItem>
+
+            <FormItem {...formItemLayout} label="作品标题">
               {getFieldDecorator('name', {
                 rules: customRules,
                 initialValue: this.state.name,
               })(<Input />)}
             </FormItem>
 
-            <FormItem {...formItemLayout} label="真实姓名">
-              {getFieldDecorator('real_name', {
+            <FormItem {...formItemLayout} label="作者">
+              {getFieldDecorator('author', {
                 rules: customRules,
-                initialValue: this.state.real_name,
+                initialValue: this.state.author,
               })(<Input />)}
             </FormItem>
 
-            <FormItem {...formItemLayout} label="岗位">
-              {getFieldDecorator('post', {
+            <FormItem {...formItemLayout} label="描述">
+              {getFieldDecorator('describe', {
                 rules: customRules,
-                initialValue: this.state.post,
-              })(<Input placeholder="产品经理" />)}
+                initialValue: this.state.describe,
+              })(<Input />)}
             </FormItem>
 
-            <FormItem {...formItemLayout} label="部门">
-              {getFieldDecorator('department', {
+            <FormItem {...formItemLayout} label="内容">
+              {getFieldDecorator('content', {
                 rules: customRules,
-                initialValue: this.state.departmentID,
-              })(
-                <Select>
-                  {department.map(item => (
-                    <Select.Option key={item.id} value={item.id}>
-                      {item.sort_name}
-                    </Select.Option>
-                  ))}
-                </Select>
-              )}
+                initialValue: this.state.content,
+              })(<Input />)}
             </FormItem>
 
-            <FormItem {...formItemLayout} label="照片">
-              {getFieldDecorator('photo', { rules: customRules })(
-                <UploadImgs
-                  isEnhanceSingle
-                  limit={1}
-                  defaultFileList={this.state.defaultFileList}
-                  handleUploadChange={fileList => this.handleUploadChange(fileList, 'photo')}
-                />
-              )}
+            <FormItem {...formItemLayout} label="分类">
+              {getFieldDecorator('sort', {
+                rules: customRules,
+                initialValue: this.state.sort,
+              })(<Input />)}
             </FormItem>
           </Form>
         </Modal>
