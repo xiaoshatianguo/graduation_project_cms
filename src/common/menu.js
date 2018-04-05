@@ -3,30 +3,23 @@ const menuData = [
     name: '账户',
     icon: 'user',
     path: 'user',
+    authority: 'guest',
     children: [
       {
         name: '登录',
         path: 'login',
       },
-      {
-        name: '注册',
-        path: 'register',
-      },
-      {
-        name: '注册结果',
-        path: 'register-result',
-      },
     ],
   },
   {
     name: '管理员',
-    icon: 'book',
+    icon: 'user',
     path: 'admin',
     authority: 'admin',
   },
   {
     name: '活动管理',
-    icon: 'android',
+    icon: 'bulb',
     path: 'activity',
     children: [
       {
@@ -63,8 +56,8 @@ const menuData = [
   },
   {
     name: '作品管理',
-    icon: 'profile',
-    path: '/production',
+    icon: 'book',
+    path: 'production',
     children: [
       {
         name: '作品信息',
@@ -78,8 +71,8 @@ const menuData = [
   },
   {
     name: '评论留言管理',
-    icon: 'bulb',
-    path: '/comments',
+    icon: 'form',
+    path: 'comments',
     children: [
       {
         name: '评论管理',
@@ -90,12 +83,7 @@ const menuData = [
         path: 'massage',
       },
     ],
-  },
-  {
-    name: '点赞关注相关',
-    icon: 'form',
-    path: '/attention',
-  },
+  }
 ];
 
 function formatter(data, parentPath = '', parentAuthority) {
