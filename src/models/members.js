@@ -1,8 +1,8 @@
 /**
- *  帮助中心模型
+ *  管理员
  */
 
-import { queryStaff, updateStaff, createStaff, deleteStaff } from '../services/members';
+import { queryUser, updateUser, createUser, deleteUser } from '../services/members';
 
 export default {
   namespace: 'members',
@@ -15,21 +15,21 @@ export default {
 
   effects: {
     *fetch({ payload }, { call, put }) {
-      const response = yield call(queryStaff, payload);
+      const response = yield call(queryUser, payload);
       yield put({
         type: 'save',
         payload: response,
       });
     },
     *put({ payload }, { call, put }) {
-      const response = yield call(updateStaff, payload);
+      const response = yield call(updateUser, payload);
       yield put({
         type: 'updete',
         payload: response,
       });
     },
     *add({ payload }, { call, put }) {
-      const response = yield call(createStaff, payload);
+      const response = yield call(createUser, payload);
       // type: 'append' 与 *add 不能重名，会触发重复的接口请求
       yield put({
         type: 'append',
@@ -37,7 +37,7 @@ export default {
       });
     },
     *delete({ payload }, { call }) {
-      yield call(deleteStaff, payload);
+      yield call(deleteUser, payload);
     },
   },
 

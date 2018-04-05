@@ -11,6 +11,7 @@ import {
   InputNumber,
   Modal,
   Form,
+  Select,
   message,
   Tooltip,
   Icon,
@@ -34,25 +35,28 @@ export class ActivityChecked extends Component {
     modalVisible: false,
     editFormTitle: '',
 
-    id: '', // 表格数据
-    title: '', // 表格数据
-    author: '', // 表格数据--作者
-    mainbody: '', // 表格数据--富文本正文
-    defaultFileList: [], // 表格数据--展示已经上传的封面
-    defaultSelectCover: [], // 表格数据--展示已经上传的精选封面
-    articleSearch: '', // 文章搜索标题
+    number: '',
+    name: '',
+    initiator: '',
+    sort: '',
+    topic: '',
+    content: '',
+    start_time: '',
+    end_time: '',
+    status: '',
+    auditor: '',
+
     editFormFlag: '', // 信息框的标记，add--添加，update--更新
     tableCurIndex: '', // 当前编辑的行数
     currentPage: 1, // 当前页数
     curPageSize: 10, // 当前页面的条数
-
   };
 
   componentDidMount = () => {
     const { currentPage, curPageSize } = this.state;
 
     this.props.dispatch({
-      type: 'article/fetch',
+      type: 'activity/fetch',
       payload: {
         currentPage,
         curPageSize,
@@ -61,102 +65,62 @@ export class ActivityChecked extends Component {
   };
 
   componentWillReceiveProps = (nextProps) => {
-    const { data } = nextProps.article;
+    const { data } = nextProps.activity;
     const { content = [], totalElements } = data;
 
-    this.setState({
-      tableData: content,
-      tableDataTotal: totalElements,
-    });
+    this.setState({ tableData: content, tableDataTotal: totalElements });
   };
 
   handleRowEditClick = (index, record) => {
-    const { id = -1, title, author, mainbody, cover, selectCover } = record;
+    const {
+      id = -1,
+      number,
+      name,
+      initiator,
+      sort,
+      topic,
+      content,
+      start_time,
+      end_time,
+      status,
+      auditor,
+    } = record;
 
-    const defaultFileList = [];
-    const defaultSelectCover = [];
-
-    if (cover) {
-      defaultFileList.push({
-        uid: cover,
-        picname: `p-${cover}.png`,
-        status: 'done',
-        url: cover,
-      });
-    }
-
-    if (selectCover) {
-      defaultSelectCover.push({
-        uid: selectCover,
-        picname: `p-${selectCover}.png`,
-        status: 'done',
-        url: selectCover,
-      });
-    }
+    this.tableCurIndex = index;
 
     this.setState({
       id,
       modalVisible: true,
-      editFormTitle: record.title,
-      defaultFileList,
-      defaultSelectCover,
+      editFormTitle: '编辑信息',
       editFormFlag: 'update',
       tableCurIndex: index,
     });
 
     this.props.form.setFieldsValue({
-      title,
-      author,
-      mainbody,
-      cover,
-      selectCover,
+      number,
+      name,
+      initiator,
+      sort,
+      topic,
+      content,
+      start_time,
+      end_time,
     });
-  };
-
-  handleRowDeleteClick = async (id, index, record) => {
-    await this.props.dispatch({
-      type: 'article/delete',
-      payload: {
-        id,
-      },
-    });
-
-    const { tableData } = this.state;
-    tableData.splice(index, 1);
-
-    this.setState({
-      tableData,
-    });
-
-    message.info(`《${record.title}》已删除 ☠️`);
-  };
-
-  handleSetBannerWeight = async (value, recode) => {
-    await this.props.dispatch({
-      type: 'article/put',
-      payload: {
-        id: recode.id,
-        set_banner: value,
-      },
-    });
-
-    message.success('知错能改，善莫大焉 🛠 ');
   };
 
   handleModalVisible = (flag) => {
     this.setState({
       modalVisible: flag,
       editFormFlag: 'add',
-      editFormTitle: '新增文章',
-      defaultSelectCover: [],
-      defaultFileList: [],
+      editFormTitle: '新增活动',
+      defaultFileListObj: {},
     });
-
+    
     this.props.form.resetFields();
   };
 
   /**
-   * 表单提交事件，判断是创建文章还是更新文章，分别调用 create 方法和 update 方法
+   * 表单提交事件，判断是创建项目还是更新项目，分别调用 create 方法和 update 方法
    */
   handleSubmit = (e) => {
     e.preventDefault();
@@ -166,13 +130,13 @@ export class ActivityChecked extends Component {
       if (!err) {
         if (editFormFlag === 'add') {
           await this.props.dispatch({
-            type: 'article/add',
+            type: 'activity/add',
             payload: values,
           });
           this.handleSucceedAdd();
         } else if (editFormFlag === 'update') {
           await this.props.dispatch({
-            type: 'article/put',
+            type: 'activity/put',
             payload: {
               id,
               ...values,
@@ -185,47 +149,17 @@ export class ActivityChecked extends Component {
   };
 
   /**
-   * 文章增加成功之后的处理方法，将文章插入到表格最前面
-   */
-  handleSucceedAdd = () => {
-    const { tableData } = this.state;
-
-    tableData.unshift(this.props.article.append);
-
-    this.setState({
-      tableDataTotal: this.state.tableDataTotal + 1,
-      curPageSize: this.state.curPageSize + 1,
-      tableData,
-    });
-
-    this.handleModalVisible(false);
-  };
-  /**
-   * 文章增加更新之后的处理方法，直接修改文章列表对应数据
+   * 项目增加更新之后的处理方法，直接修改项目列表对应数据
    */
   handleSucceedUpdate = () => {
     const { tableData, tableCurIndex } = this.state;
 
-    tableData[tableCurIndex] = this.props.article.updete;
+    tableData[tableCurIndex] = this.props.activity.updete;
 
     this.setState({ tableData });
     this.handleModalVisible(false);
-  };
 
-  /**
-   * 处理图片上传组件成功上传之后返回的数据
-   *
-   * @param  {object} [fileList]       文件数据对象数组
-   * @param  {string} tag     图片上传组件对应的表单字段
-   */
-  handleUploadChange = (fileList, tag) => {
-    const valueObj = {};
-
-    if (fileList.length > 0) {
-      const imageURL = `${qiniuDomain}/${fileList[0].response.key}`;
-      valueObj[tag] = imageURL;
-      this.props.form.setFieldsValue(valueObj);
-    }
+    message.info(`活动信息已更新`);
   };
 
   /**
@@ -238,7 +172,7 @@ export class ActivityChecked extends Component {
     const { curPageSize } = this.state;
 
     this.props.dispatch({
-      type: 'article/fetch',
+      type: 'activity/fetch',
       payload: {
         currentPage: current,
         curPageSize,
@@ -251,38 +185,52 @@ export class ActivityChecked extends Component {
   render() {
     const columns = [
       {
-        title: '标题',
+        title: '编号',
         className: 'ant-tableThead',
-        dataIndex: 'title',
+        dataIndex: 'number',
       },
       {
-        title: '作者',
+        title: '活动名称',
         className: 'ant-tableThead',
-        dataIndex: 'author',
-        width: 100,
+        dataIndex: 'name',
       },
       {
-        title: '创建时间',
+        title: '发起者',
         className: 'ant-tableThead',
-        dataIndex: 'create_time',
-        width: 160,
+        dataIndex: 'initiator',
+      },
+      {
+        title: '类别',
+        className: 'ant-tableThead',
+        dataIndex: 'sort',
+      },
+      {
+        title: '主题',
+        className: 'ant-tableThead',
+        dataIndex: 'topic',
+      },
+      {
+        title: '开始时间',
+        className: 'ant-tableThead',
+        dataIndex: 'start_time',
         render: (text) => {
           return <span>{moment(text).format('YYYY-MM-DD')}</span>;
         },
       },
       {
-        title: 'Banner权重',
+        title: '结束时间',
         className: 'ant-tableThead',
-        dataIndex: 'set_banner',
-        render: (text, record) => {
-          return (
-            <InputNumber
-              defaultValue={text}
-              min={0}
-              max={100}
-              onChange={value => this.handleSetBannerWeight(value, record)}
-            />
-          );
+        dataIndex: 'end_time',
+        render: (text) => {
+          return <span>{moment(text).format('YYYY-MM-DD')}</span>;
+        },
+      },
+      {
+        title: '创建时间',
+        className: 'ant-tableThead',
+        dataIndex: 'create_time',
+        render: (text) => {
+          return <span>{moment(text).format('YYYY-MM-DD')}</span>;
         },
       },
       {
@@ -298,17 +246,6 @@ export class ActivityChecked extends Component {
               <Button icon="edit" onClick={() => this.handleRowEditClick(index, record)}>
                 编辑
               </Button>
-              <span className="ant-divider" />
-
-              <Popconfirm
-                title="确定要删除吗？"
-                placement="topRight"
-                onConfirm={() => this.handleRowDeleteClick(id, index, record)}
-              >
-                <Button type="danger" icon="delete">
-                  删除
-                </Button>
-              </Popconfirm>
             </span>
           );
         },
@@ -319,7 +256,7 @@ export class ActivityChecked extends Component {
     const formItemLayout = {
       labelCol: {
         xs: { span: 24 },
-        sm: { span: 4 },
+        sm: { span: 5 },
       },
       wrapperCol: {
         xs: { span: 24 },
@@ -336,34 +273,22 @@ export class ActivityChecked extends Component {
     ];
 
     const { loading } = this.props;
-    const {
-      modalVisible,
-      editFormTitle,
-      currentPage,
-      curPageSize,
-      tableDataTotal,
-    } = this.state;
-
+    const { modalVisible, editFormTitle, currentPage, curPageSize, tableDataTotal } = this.state;
     return (
       <PageHeaderLayout
-        title="博客文章"
-        content="博客文章用户在博客页面中展示，单篇文章点击可跳转至文章详情。"
+        title="活动审核"
+        content="审核认证师提交的活动申请。"
       >
         <Card>
           <Row gutter={24}>
             <Col span={2}>
-              <h4>标题：</h4>
+              <h4>活动名称：</h4>
             </Col>
             <Col span={4}>
               <Input />
             </Col>
             <Col span={8}>
               <Button icon="search">查询</Button>
-            </Col>
-            <Col span={4} offset={4}>
-              <Button type="primary" icon="plus" onClick={() => this.handleModalVisible(true)}>
-                新增文章
-              </Button>
             </Col>
           </Row>
         </Card>
@@ -389,56 +314,51 @@ export class ActivityChecked extends Component {
           width={800}
           onOk={this.handleSubmit}
           onCancel={() => this.handleModalVisible(false)}
-          confirmLoading={loading}
         >
           <Form onSubmit={this.handleSubmit} width={800}>
-            <FormItem {...formItemLayout} label="标题">
-              {getFieldDecorator('title', {
+            <FormItem {...formItemLayout} label="活动编号">
+              {getFieldDecorator('number', {
                 rules: customRules,
-                initialValue: this.state.title,
-              })(<Input placeholder="请输入文章标题" />)}
+                initialValue: this.state.number,
+              })(<Input placeholder="请输入活动编号" />)}
             </FormItem>
 
-            <FormItem {...formItemLayout} label="作者">
-              {getFieldDecorator('author', {
+            <FormItem {...formItemLayout} label="活动名称">
+              {getFieldDecorator('name', {
                 rules: customRules,
-                initialValue: this.state.author,
-              })(<Input placeholder="请输入文章作者" />)}
+                initialValue: this.state.name,
+              })(<Input placeholder="请输入活动名称" />)}
             </FormItem>
 
-            <FormItem {...formItemLayout} label="文章正文">
-              {getFieldDecorator('mainbody', {
+            <FormItem {...formItemLayout} label="发起者">
+              {getFieldDecorator('initiator', {
                 rules: customRules,
-                initialValue: this.state.mainbody,
+                initialValue: this.state.initiator,
+              })(<Input placeholder="请输入活动发起者" />)}
+            </FormItem>
+
+            <FormItem {...formItemLayout} label="类别">
+              {getFieldDecorator('sort', {
+                rules: customRules,
+                initialValue: this.state.sort,
+              })(<Input placeholder="请输入活动类别" />)}
+            </FormItem>
+
+            <FormItem {...formItemLayout} label="主题">
+              {getFieldDecorator('topic', {
+                rules: customRules,
+                initialValue: this.state.topic,
+              })(<Input placeholder="请输入活动主题" />)}
+            </FormItem>
+
+            <FormItem {...formItemLayout} label="活动详情正文">
+              {getFieldDecorator('content', {
+                rules: customRules,
+                initialValue: this.state.content,
               })(
                 <TextArea
-                  placeholder="请录入 MarkDown 格式的文章正文"
+                  placeholder="请录入 MarkDown 格式的活动详情正文"
                   autosize={{ minRows: 6, maxRows: 20 }}
-                />
-              )}
-            </FormItem>
-
-            <FormItem {...formItemLayout} label="封面">
-              {getFieldDecorator('cover', {
-                // rules: customRules,
-                // initialValue: this.state.cover,
-              })(
-                <UploadImgs
-                  isEnhanceSingle
-                  limit={1}
-                  defaultFileList={this.state.defaultFileList}
-                  handleUploadChange={fileList => this.handleUploadChange(fileList, 'cover')}
-                />
-              )}
-            </FormItem>
-
-            <FormItem {...formItemLayout} label={(<span>精选封面&nbsp;<Tooltip title="若不上传，则默认使用普通案例封面; 上传则优先使用精选封面"><Icon type="info-circle-o" /></Tooltip></span>)}>
-              {getFieldDecorator('selectCover', {})(
-                <UploadImgs
-                  isEnhanceSingle
-                  limit={1}
-                  defaultFileList={this.state.defaultSelectCover}
-                  handleUploadChange={fileList => this.handleUploadChange(fileList, 'selectCover')}
                 />
               )}
             </FormItem>

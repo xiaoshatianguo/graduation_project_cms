@@ -21,99 +21,100 @@ import { qiniuDomain } from '../../utils/appConfig';
 
 const FormItem = Form.Item;
 
-@connect(({ staff, loading, department }) => ({
-  staff,
-  department,
-  loading: loading.models.staff,
+// 连接model层的state数据，然后通过this.props.state名(namespace)访问model层的state数据
+@connect(({ members, loading }) => ({
+  members,
+  loading: loading.models.members,
 }))
+
 @Form.create()
-export class Members extends Component {
+export class MembersManage extends Component {
   state = {
     tableData: [],
     modalVisible: false,
     editFormTitle: '',
 
-    id: '', // 表格数据
+    number: '',
+    email: '',
+    phone: '',
+    password: '',
+    nickname: '',
     name: '',
-    post: '',
-    photo: '',
-    departmentID: '', // 表格数据--所属部门
-    department: '',
-    real_name: '',
+    sex: '',
+    age: '',
+    address: '',
+    portrait: '',
+    personal_statement: '',
+    integral: '',
+    status: '',
 
-    titleSearch: '', // 员工搜索标题
     editFormFlag: '', // 信息框的标记，add--添加，update--更新
     tableCurIndex: '', // 当前编辑的行数
     currentPage: 1, // 当前页数
     curPageSize: 10, // 当前页面的条数
-
-    department: [], // 后台获取的部门列表
   };
 
   componentDidMount = () => {
     const { currentPage, curPageSize } = this.state;
 
     this.props.dispatch({
-      type: 'staff/fetch',
+      type: 'members/fetch',
       payload: {
         currentPage,
         curPageSize,
       },
     });
-
-    this.props.dispatch({
-      type: 'department/fetch',
-    });
   };
 
   componentWillReceiveProps = (nextProps) => {
-    const { data } = nextProps.staff;
+    const { data } = nextProps.members;
     const { content = [], totalElements } = data;
-
     this.setState({
       tableData: content,
       tableDataTotal: totalElements,
-      department: nextProps.department.data,
     });
   };
 
   handleRowEditClick = (index, record) => {
-    const { id = -1, name, post, photo, department, real_name } = record;
+    const { 
+      id = -1, 
+      number,
+      email,
+      phone,
+      password,
+      nickname,
+      name,
+      sex,
+      age,
+      address,
+      portrait,
+      personal_statement,
+      integral,
+      status,
+    } = record;
     this.tableCurIndex = index;
-
-    const defaultFileList = [];
-
-    if (photo) {
-      defaultFileList.push({
-        uid: photo,
-        picname: `p-${photo}.png`,
-        status: 'done',
-        url: photo,
-      });
-    }
 
     this.setState({
       id,
       modalVisible: true,
-      editFormTitle: record.title,
-      defaultFileList,
+      editFormTitle: '编辑信息',
       editFormFlag: 'update',
       tableCurIndex: index,
-      departmentID: department,
     });
 
     this.props.form.setFieldsValue({
-      name,
-      post,
-      photo,
-      department,
-      real_name,
+      number,
+      email,
+      phone,
+      nickname,
+      sex,
+      integral,
     });
   };
 
   handleRowDeleteClick = async (id, index, record) => {
     await this.props.dispatch({
-      type: 'staff/delete',
+      type: 'members/delete',
       payload: {
         id,
       },
@@ -126,34 +127,21 @@ export class Members extends Component {
       tableData,
     });
 
-    message.info(`《${record.name}》已删除 ☠️`);
-  };
-
-  handleSetBannerWeight = async (value, recode) => {
-    await this.props.dispatch({
-      type: 'staff/put',
-      payload: {
-        id: recode.id,
-        weight: value,
-      },
-    });
-
-    message.success('知错能改，善莫大焉 🛠 ');
+    message.info(`《${record.number}${record.nickname}》已删除 ☠️`);
   };
 
   handleModalVisible = (flag) => {
     this.setState({
       modalVisible: flag,
       editFormFlag: 'add',
-      editFormTitle: '新增条目',
-      defaultFileList: [],
+      editFormTitle: '新增用户',
     });
 
     this.props.form.resetFields();
   };
 
   /**
-   * 表单提交事件，判断是创建员工还是更新员工，分别调用 create 方法和 update 方法
+   * 表单提交事件，判断是创建用户还是更新用户，分别调用 create 方法和 update 方法
    */
   handleSubmit = (e) => {
     e.preventDefault();
@@ -163,13 +151,13 @@ export class Members extends Component {
       if (!err) {
         if (editFormFlag === 'add') {
           await this.props.dispatch({
-            type: 'staff/add',
+            type: 'members/add',
             payload: values,
           });
           this.handleSucceedAdd();
         } else if (editFormFlag === 'update') {
           await this.props.dispatch({
-            type: 'staff/put',
+            type: 'members/put',
             payload: {
               id,
               ...values,
@@ -182,12 +170,12 @@ export class Members extends Component {
   };
 
   /**
-   * 员工增加成功之后的处理方法，将员工插入到表格最前面
+   * 用户增加成功之后的处理方法，将用户插入到表格最前面
    */
   handleSucceedAdd = () => {
     const { tableData } = this.state;
 
-    tableData.unshift(this.props.staff.append);
+    tableData.unshift(this.props.members.append);
 
     this.setState({
       tableDataTotal: this.state.tableDataTotal + 1,
@@ -196,33 +184,22 @@ export class Members extends Component {
     });
 
     this.handleModalVisible(false);
+
+    message.info(`新增用户成功`);
   };
+
   /**
-   * 员工增加更新之后的处理方法，直接修改员工列表对应数据
+   * 用户增加更新之后的处理方法，直接修改用户列表对应数据
    */
   handleSucceedUpdate = () => {
     const { tableData, tableCurIndex } = this.state;
 
-    tableData[tableCurIndex] = this.props.staff.updete;
+    tableData[tableCurIndex] = this.props.members.updete;
 
     this.setState({ tableData });
     this.handleModalVisible(false);
-  };
 
-  /**
-   * 处理图片上传组件成功上传之后返回的数据
-   *
-   * @param  {object} [fileList]       文件数据对象数组
-   * @param  {string} tag     图片上传组件对应的表单字段
-   */
-  handleUploadChange = (fileList, tag) => {
-    const valueObj = {};
-
-    if (fileList.length > 0) {
-      const imageURL = `${qiniuDomain}/${fileList[0].response.key}`;
-      valueObj[tag] = imageURL;
-      this.props.form.setFieldsValue(valueObj);
-    }
+    message.info(`用户信息已更新`);
   };
 
   /**
@@ -235,7 +212,7 @@ export class Members extends Component {
     const { curPageSize } = this.state;
 
     this.props.dispatch({
-      type: 'staff/fetch',
+      type: 'members/fetch',
       payload: {
         currentPage: current,
         curPageSize,
@@ -248,37 +225,79 @@ export class Members extends Component {
   render() {
     const columns = [
       {
-        title: '照片',
+        title: '编号',
         className: 'ant-tableThead',
-        dataIndex: 'photo',
-        render: (text) => {
-          return <Avatar shape="square" src={text} size="large" />;
-        },
+        dataIndex: 'number',
       },
       {
         title: '昵称',
         className: 'ant-tableThead',
+        dataIndex: 'nickname',
+      },
+      {
+        title: '真实名字',
+        className: 'ant-tableThead',
         dataIndex: 'name',
       },
       {
-        title: '真实姓名',
+        title: '邮箱',
         className: 'ant-tableThead',
-        dataIndex: 'real_name',
+        dataIndex: 'email',
       },
       {
-        title: '岗位',
+        title: '手机',
         className: 'ant-tableThead',
-        dataIndex: 'post',
+        dataIndex: 'phone',
       },
       {
-        title: '部门',
+        title: '密码',
         className: 'ant-tableThead',
-        dataIndex: 'sort_name',
+        dataIndex: 'password',
+      },
+      
+      {
+        title: '性别',
+        className: 'ant-tableThead',
+        dataIndex: 'sex',
+      },
+      {
+        title: '年龄',
+        className: 'ant-tableThead',
+        dataIndex: 'age',
+      },
+      {
+        title: '地址',
+        className: 'ant-tableThead',
+        dataIndex: 'address',
+      },
+      {
+        title: '头像',
+        className: 'ant-tableThead',
+        dataIndex: 'portrait',
+      },
+      {
+        title: '宣言',
+        className: 'ant-tableThead',
+        dataIndex: 'personal_statement',
+      },
+      {
+        title: '积分',
+        className: 'ant-tableThead',
+        dataIndex: 'integral',
       },
       {
         title: '创建时间',
         className: 'ant-tableThead',
         dataIndex: 'create_time',
+        width: 160,
+        render: (text) => {
+          return <span>{moment(text).format('YYYY-MM-DD')}</span>;
+        },
+      },
+      {
+        title: '最后登录时间',
+        className: 'ant-tableThead',
+        dataIndex: 'lastest_login_time',
         width: 160,
         render: (text) => {
           return <span>{moment(text).format('YYYY-MM-DD')}</span>;
@@ -341,28 +360,33 @@ export class Members extends Component {
       currentPage,
       curPageSize,
       tableDataTotal,
-      department,
     } = this.state;
 
     return (
       <PageHeaderLayout
-        title="员工管理"
-        content="在 “关于我们” 子页面中可以看到各个部门的员工， 请确保真实姓名是正确的，会和案例页面中的员工名字相关联。"
+        title="用户管理"
+        content="用户列表管理"
       >
         <Card>
           <Row gutter={24}>
-            <Col span={4}>
-              <h4>员工标题：</h4>
+            <Col span={3}>
+              <h4>用户编号：</h4>
             </Col>
             <Col span={4}>
               <Input />
             </Col>
-            <Col span={8}>
+            <Col span={3}>
+              <h4>用户昵称：</h4>
+            </Col>
+            <Col span={4}>
+              <Input />
+            </Col>
+            <Col span={2}>
               <Button icon="search">查询</Button>
             </Col>
             <Col span={4} offset={2}>
               <Button type="primary" icon="plus" onClick={() => this.handleModalVisible(true)}>
-                新增员工
+                新增用户
               </Button>
             </Col>
           </Row>
@@ -391,51 +415,46 @@ export class Members extends Component {
           onCancel={() => this.handleModalVisible(false)}
         >
           <Form onSubmit={this.handleSubmit} width={800}>
+            <FormItem {...formItemLayout} label="编号">
+              {getFieldDecorator('number', {
+                rules: customRules,
+                initialValue: this.state.number,
+              })(<Input />)}
+            </FormItem>
+
             <FormItem {...formItemLayout} label="昵称">
-              {getFieldDecorator('name', {
+              {getFieldDecorator('nickname', {
                 rules: customRules,
-                initialValue: this.state.name,
+                initialValue: this.state.nickname,
               })(<Input />)}
             </FormItem>
 
-            <FormItem {...formItemLayout} label="真实姓名">
-              {getFieldDecorator('real_name', {
+            <FormItem {...formItemLayout} label="邮箱">
+              {getFieldDecorator('email', {
                 rules: customRules,
-                initialValue: this.state.real_name,
+                initialValue: this.state.email,
               })(<Input />)}
             </FormItem>
 
-            <FormItem {...formItemLayout} label="岗位">
-              {getFieldDecorator('post', {
+            <FormItem {...formItemLayout} label="手机">
+              {getFieldDecorator('phone', {
                 rules: customRules,
-                initialValue: this.state.post,
-              })(<Input placeholder="产品经理" />)}
+                initialValue: this.state.phone,
+              })(<Input />)}
             </FormItem>
 
-            <FormItem {...formItemLayout} label="部门">
-              {getFieldDecorator('department', {
+            <FormItem {...formItemLayout} label="性别">
+              {getFieldDecorator('sex', {
                 rules: customRules,
-                initialValue: this.state.departmentID,
-              })(
-                <Select>
-                  {department.map(item => (
-                    <Select.Option key={item.id} value={item.id}>
-                      {item.sort_name}
-                    </Select.Option>
-                  ))}
-                </Select>
-              )}
+                initialValue: this.state.sex,
+              })(<Input />)}
             </FormItem>
 
-            <FormItem {...formItemLayout} label="照片">
-              {getFieldDecorator('photo', { rules: customRules })(
-                <UploadImgs
-                  isEnhanceSingle
-                  limit={1}
-                  defaultFileList={this.state.defaultFileList}
-                  handleUploadChange={fileList => this.handleUploadChange(fileList, 'photo')}
-                />
-              )}
+            <FormItem {...formItemLayout} label="积分">
+              {getFieldDecorator('integral', {
+                rules: customRules,
+                initialValue: this.state.integral,
+              })(<Input />)}
             </FormItem>
           </Form>
         </Modal>
@@ -444,4 +463,4 @@ export class Members extends Component {
   }
 }
 
-export default Members;
+export default MembersManage;
