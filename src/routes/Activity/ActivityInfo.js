@@ -16,18 +16,17 @@ import {
   Tooltip,
   Icon,
 } from 'antd';
+import moment from 'moment';
 import PageHeaderLayout from '../../layouts/PageHeaderLayout';
 import UploadImgs from '../../components/UploadImgs/UploadImgs';
-import CaseCommentModal from './CaseCommentModal';
 import { qiniuDomain } from '../../utils/appConfig';
 
 const FormItem = Form.Item;
 const { TextArea } = Input;
-const fileListKeys = ['cover', 'mobile_cover', 'icon', 'banner', 'mobile_banner', 'qrcode'];
 
 @connect(({ activity, loading }) => ({
-  projectCase,
-  loading: loading.models.projectCase,
+  activity,
+  loading: loading.models.activity,
 }))
 @Form.create()
 export class ActivityInfo extends Component {
@@ -36,38 +35,28 @@ export class ActivityInfo extends Component {
     modalVisible: false,
     editFormTitle: '',
 
-    id: '', // 表格数据
-    title: '',
-    weight: '',
-    cover: '',
-    mobile_cover: '',
-    icon: '',
-    describe: '',
-    banner: '',
-    mobile_banner: '',
-    case_type: '',
-    system_platform: '',
-    solution: '',
-    qrcode: '',
-    mainbody: '',
+    number: '',
+    name: '',
+    initiator: '',
+    sort: '',
+    topic: '',
+    content: '',
+    start_time: '',
+    end_time: '',
+    status: '',
+    auditor: '',
 
-    articleSearch: '', // 项目搜索标题
     editFormFlag: '', // 信息框的标记，add--添加，update--更新
     tableCurIndex: '', // 当前编辑的行数
     currentPage: 1, // 当前页数
     curPageSize: 10, // 当前页面的条数
-    defaultFileListObj: {}, // 图片预览对象
-
-    commentModalVisible: false, // 评论编辑弹窗
-    commentModalRecord: {}, //  当前编辑评论对应的行记录
-    commentModalComment: [], // 当前编辑的评论列表
   };
 
   componentDidMount = () => {
     const { currentPage, curPageSize } = this.state;
 
     this.props.dispatch({
-      type: 'projectCase/fetch',
+      type: 'activity/fetch',
       payload: {
         currentPage,
         curPageSize,
@@ -76,7 +65,7 @@ export class ActivityInfo extends Component {
   };
 
   componentWillReceiveProps = (nextProps) => {
-    const { data } = nextProps.projectCase;
+    const { data } = nextProps.activity;
     const { content = [], totalElements } = data;
 
     this.setState({ tableData: content, tableDataTotal: totalElements });
@@ -85,80 +74,43 @@ export class ActivityInfo extends Component {
   handleRowEditClick = (index, record) => {
     const {
       id = -1,
-      title,
-      weight,
-      describe,
-      case_type,
-      system_platform,
-      solution,
-      mainbody,
-      cover,
-      mobile_cover,
-      icon,
-      banner,
-      mobile_banner,
-      qrcode,
+      number,
+      name,
+      initiator,
+      sort,
+      topic,
+      content,
+      start_time,
+      end_time,
+      status,
+      auditor,
     } = record;
 
     this.tableCurIndex = index;
-    this.handleDefaultFileListObj({
-      cover,
-      mobile_cover,
-      icon,
-      banner,
-      mobile_banner,
-      qrcode,
-    });
 
     this.setState({
       id,
       modalVisible: true,
-      editFormTitle: record.title,
+      editFormTitle: '编辑信息',
       editFormFlag: 'update',
       tableCurIndex: index,
     });
 
     this.props.form.setFieldsValue({
-      title,
-      weight,
-      describe,
-      case_type,
-      system_platform,
-      solution,
-      mainbody,
-      cover,
-      mobile_cover,
-      icon,
-      banner,
-      mobile_banner,
-      qrcode,
+      number,
+      name,
+      initiator,
+      sort,
+      topic,
+      content,
+      start_time,
+      end_time,
     });
-  };
-
-  /**
-   * 将图片链接封装成对象，方便组件中获取
-   * @param  {string[]} fileList    需要进行处理的图片链接地址数组
-   */
-  handleDefaultFileListObj = (recordObj) => {
-    const defaultFileListObj = {};
-
-    fileListKeys.forEach((item, index) => {
-      defaultFileListObj[item] = [
-        {
-          uid: recordObj[item] || index,
-          picname: `p-${recordObj[item] || '请添加图片'}.png`,
-          status: 'done',
-          url: recordObj[item] || 'http://oudfgqwcq.bkt.clouddn.com/lyctea/1516351046468.jpg',
-        },
-      ];
-    });
-
-    this.setState({ defaultFileListObj });
   };
 
   handleRowDeleteClick = async (id, index, record) => {
     await this.props.dispatch({
-      type: 'projectCase/delete',
+      type: 'activity/delete',
       payload: {
         id,
       },
@@ -171,26 +123,14 @@ export class ActivityInfo extends Component {
       tableData,
     });
 
-    message.info(`《${record.title}》已删除 ☠️`);
-  };
-
-  handleSetBannerWeight = async (value, recode) => {
-    await this.props.dispatch({
-      type: 'projectCase/put',
-      payload: {
-        id: recode.id,
-        weight: value,
-      },
-    });
-
-    message.success('知错能改，善莫大焉 🛠 ');
+    message.info(`《${record.name}》已删除 ☠️`);
   };
 
   handleModalVisible = (flag) => {
     this.setState({
       modalVisible: flag,
       editFormFlag: 'add',
-      editFormTitle: '新增项目',
+      editFormTitle: '新增活动',
       defaultFileListObj: {},
     });
     
@@ -208,13 +148,13 @@ export class ActivityInfo extends Component {
       if (!err) {
         if (editFormFlag === 'add') {
           await this.props.dispatch({
-            type: 'projectCase/add',
+            type: 'activity/add',
             payload: values,
           });
           this.handleSucceedAdd();
         } else if (editFormFlag === 'update') {
           await this.props.dispatch({
-            type: 'projectCase/put',
+            type: 'activity/put',
             payload: {
               id,
               ...values,
@@ -232,7 +172,7 @@ export class ActivityInfo extends Component {
   handleSucceedAdd = () => {
     const { tableData } = this.state;
 
-    tableData.unshift(this.props.projectCase.append);
+    tableData.unshift(this.props.activity.append);
 
     this.setState({
       tableDataTotal: this.state.tableDataTotal + 1,
@@ -241,6 +181,8 @@ export class ActivityInfo extends Component {
     });
 
     this.handleModalVisible(false);
+
+    message.info(`新增活动成功`);
   };
   /**
    * 项目增加更新之后的处理方法，直接修改项目列表对应数据
@@ -248,28 +190,12 @@ export class ActivityInfo extends Component {
   handleSucceedUpdate = () => {
     const { tableData, tableCurIndex } = this.state;
 
-    tableData[tableCurIndex] = this.props.projectCase.updete;
+    tableData[tableCurIndex] = this.props.activity.updete;
 
     this.setState({ tableData });
     this.handleModalVisible(false);
-  };
 
-  /**
-   * 处理图片上传组件成功上传之后返回的数据
-   *
-   * @param  {object} [fileList]       文件数据对象数组
-   * @param  {string} tag     图片上传组件对应的表单字段
-   */
-  handleUploadChange = (fileList, tag) => {
-    const valueObj = {};
-
-    if (fileList.length > 0) {
-      const imageURL = `${qiniuDomain}/${fileList[0].response.key}`;
-      valueObj[tag] = imageURL;
-      this.props.form.setFieldsValue(valueObj);
-    }
-
-    // TODO: 更新上传的图片
+    message.info(`活动信息已更新`);
   };
 
   /**
@@ -282,7 +208,7 @@ export class ActivityInfo extends Component {
     const { curPageSize } = this.state;
 
     this.props.dispatch({
-      type: 'projectCase/fetch',
+      type: 'activity/fetch',
       payload: {
         currentPage: current,
         curPageSize,
@@ -292,109 +218,62 @@ export class ActivityInfo extends Component {
     this.setState({ currentPage: current });
   };
 
-  /**
-   * 优质案例评论编辑关闭
-   */
-  commentModalClose = () => {
-    this.setState({
-      commentModalVisible: false,
-    });
-  };
-
-  /**
-   * 优质案例评论编辑打开
-   */
-  handlecommentModalOpen = (record) => {
-    this.setState({
-      commentModalVisible: true,
-      commentModalRecord: record,
-      commentModalComment: JSON.parse(record.commentList || '[]'),
-    });
-  };
-
-  /**
-   * 更新优质案例评论
-   */
-  handleUpdateComment = async () => {
-    const { commentModalRecord, commentModalComment } = this.state;
-
-    await this.props.dispatch({
-      type: 'projectCase/put',
-      payload: {
-        id: commentModalRecord.id,
-        commentList: JSON.stringify(commentModalComment),
-      },
-    });
-
-    this.handleSucceedUpdate();
-    this.setState({ commentModalVisible: false });
-  };
-
-  /**
-   * 增加当前编辑行的评论
-   * @param {Object} comment  评论对象
-   */
-  handleAddComment = (comment) => {
-    const { commentModalComment } = this.state;
-    commentModalComment.push(comment);
-
-    this.setState({ commentModalComment });
-  };
-
-  /**
-   * 删除当前编辑行的评论
-   * @param {Object} comment  评论对象
-   */
-  handleDeleteComment = (index) => {
-    const { commentModalComment } = this.state;
-    commentModalComment.splice(index, 1);
-
-    this.setState({ commentModalComment });
-  };
-
   render() {
     const columns = [
       {
-        title: '标题',
+        title: '编号',
         className: 'ant-tableThead',
-        dataIndex: 'title',
-        width: 100,
+        dataIndex: 'number',
       },
       {
-        title: '封面描述',
+        title: '活动名称',
         className: 'ant-tableThead',
-        dataIndex: 'describe',
-        width: 400,
+        dataIndex: 'name',
+      },
+      {
+        title: '发起者',
+        className: 'ant-tableThead',
+        dataIndex: 'initiator',
+      },
+      {
+        title: '类别',
+        className: 'ant-tableThead',
+        dataIndex: 'sort',
+      },
+      {
+        title: '主题',
+        className: 'ant-tableThead',
+        dataIndex: 'topic',
+      },
+      {
+        title: '开始时间',
+        className: 'ant-tableThead',
+        dataIndex: 'start_time',
+        render: (text) => {
+          return <span>{moment(text).format('YYYY-MM-DD')}</span>;
+        },
+      },
+      {
+        title: '结束时间',
+        className: 'ant-tableThead',
+        dataIndex: 'end_time',
+        render: (text) => {
+          return <span>{moment(text).format('YYYY-MM-DD')}</span>;
+        },
       },
       {
         title: '创建时间',
         className: 'ant-tableThead',
         dataIndex: 'create_time',
-        width: 200,
         render: (text) => {
-          return <span>{text}</span>;
-        },
-      },
-      {
-        title: '精选权重',
-        className: 'ant-tableThead',
-        dataIndex: 'weight',
-        render: (text, record, index) => {
-          return (
-            <InputNumber
-              defaultValue={text}
-              min={0}
-              max={100}
-              onChange={value => this.handleSetBannerWeight(value, record)}
-            />
-          );
+          return <span>{moment(text).format('YYYY-MM-DD')}</span>;
         },
       },
       {
         title: '操作',
         className: 'ant-tableThead',
         key: 'action',
-        width: 400,
+        width: 300,
         render: (text, record, index) => {
           const { id = -1 } = record;
 
@@ -402,10 +281,6 @@ export class ActivityInfo extends Component {
             <span>
               <Button icon="edit" onClick={() => this.handleRowEditClick(index, record)}>
                 编辑
-              </Button>
-              <span className="ant-divider" />
-              <Button icon="edit" onClick={() => this.handlecommentModalOpen(record)}>
-                评论
               </Button>
               <span className="ant-divider" />
 
@@ -448,13 +323,13 @@ export class ActivityInfo extends Component {
     const { modalVisible, editFormTitle, currentPage, curPageSize, tableDataTotal } = this.state;
     return (
       <PageHeaderLayout
-        title="优质案例"
-        content="用于在 “项目案例” 页面中，作为精选案例的案例，可跳转到该案例的详情页中。"
+        title="活动管理"
+        content="管理已经通过审核的活动信息。"
       >
         <Card>
           <Row gutter={24}>
             <Col span={2}>
-              <h4>标题：</h4>
+              <h4>活动名称：</h4>
             </Col>
             <Col span={4}>
               <Input />
@@ -464,7 +339,7 @@ export class ActivityInfo extends Component {
             </Col>
             <Col span={4} offset={4}>
               <Button type="primary" icon="plus" onClick={() => this.handleModalVisible(true)}>
-                新增项目
+                新增官方活动
               </Button>
             </Col>
           </Row>
@@ -493,132 +368,54 @@ export class ActivityInfo extends Component {
           onCancel={() => this.handleModalVisible(false)}
         >
           <Form onSubmit={this.handleSubmit} width={800}>
-            <FormItem {...formItemLayout} label="项目名">
-              {getFieldDecorator('title', {
+            <FormItem {...formItemLayout} label="活动编号">
+              {getFieldDecorator('number', {
                 rules: customRules,
-                initialValue: this.state.title,
-              })(<Input placeholder="请输入项目名" />)}
+                initialValue: this.state.number,
+              })(<Input placeholder="请输入活动编号" />)}
             </FormItem>
 
-            <FormItem {...formItemLayout} label="封面描述">
-              {getFieldDecorator('describe', {
+            <FormItem {...formItemLayout} label="活动名称">
+              {getFieldDecorator('name', {
                 rules: customRules,
-                initialValue: this.state.describe,
-              })(<Input placeholder="请输入项目名" />)}
+                initialValue: this.state.name,
+              })(<Input placeholder="请输入活动名称" />)}
             </FormItem>
 
-            <FormItem {...formItemLayout} label="pc封面大图">
-              {getFieldDecorator('cover', {})(
-                <UploadImgs
-                  isEnhanceSingle
-                  limit={1}
-                  defaultFileList={this.state.defaultFileListObj.cover}
-                  handleUploadChange={fileList => this.handleUploadChange(fileList, 'cover')}
-                />
-              )}
-            </FormItem>
-
-            <FormItem {...formItemLayout} label="mobile封面大图">
-              {getFieldDecorator('mobile_cover', {})(
-                <UploadImgs
-                  isEnhanceSingle
-                  limit={1}
-                  defaultFileList={this.state.defaultFileListObj.mobile_cover}
-                  handleUploadChange={fileList => this.handleUploadChange(fileList, 'mobile_cover')}
-                />
-              )}
-            </FormItem>
-
-            <FormItem {...formItemLayout} label="封面小图标">
-              {getFieldDecorator('icon', {})(
-                <UploadImgs
-                  isEnhanceSingle
-                  limit={1}
-                  defaultFileList={this.state.defaultFileListObj.icon}
-                  handleUploadChange={fileList => this.handleUploadChange(fileList, 'icon')}
-                />
-              )}
-            </FormItem>
-
-            <FormItem {...formItemLayout} label="pc详情页banner">
-              {getFieldDecorator('banner', {})(
-                <UploadImgs
-                  isEnhanceSingle
-                  limit={1}
-                  defaultFileList={this.state.defaultFileListObj.banner}
-                  handleUploadChange={fileList => this.handleUploadChange(fileList, 'banner')}
-                />
-              )}
-            </FormItem>
-
-            <FormItem {...formItemLayout} label="mobile详情页banner">
-              {getFieldDecorator('mobile_banner', {})(
-                <UploadImgs
-                  isEnhanceSingle
-                  limit={1}
-                  defaultFileList={this.state.defaultFileListObj.mobile_banner}
-                  handleUploadChange={fileList =>
-                    this.handleUploadChange(fileList, 'mobile_banner')
-                  }
-                />
-              )}
-            </FormItem>
-
-            <FormItem {...formItemLayout} label="二维码">
-              {getFieldDecorator('qrcode', {})(
-                <UploadImgs
-                  isEnhanceSingle
-                  limit={1}
-                  defaultFileList={this.state.defaultFileListObj.qrcode}
-                  handleUploadChange={fileList => this.handleUploadChange(fileList, 'qrcode')}
-                />
-              )}
-            </FormItem>
-
-            <FormItem {...formItemLayout} label={(<span>案例类型&nbsp;<Tooltip title="友情提示：以英文标点逗号分隔"><Icon type="info-circle-o" /></Tooltip></span>)}>
-              {getFieldDecorator('case_type', {
+            <FormItem {...formItemLayout} label="发起者">
+              {getFieldDecorator('initiator', {
                 rules: customRules,
-                initialValue: this.state.case_type,
-              })(<Input placeholder="出行,共享平台" />)}
+                initialValue: this.state.initiator,
+              })(<Input placeholder="请输入活动发起者" />)}
             </FormItem>
 
-            <FormItem {...formItemLayout} label={(<span>系统平台&nbsp;<Tooltip title="友情提示：以英文标点逗号分隔"><Icon type="info-circle-o" /></Tooltip></span>)}>
-              {getFieldDecorator('system_platform', {
+            <FormItem {...formItemLayout} label="类别">
+              {getFieldDecorator('sort', {
                 rules: customRules,
-                initialValue: this.state.system_platform,
-              })(<Input placeholder="安卓,IOS" />)}
+                initialValue: this.state.sort,
+              })(<Input placeholder="请输入活动类别" />)}
             </FormItem>
 
-            <FormItem {...formItemLayout} label={(<span>解决方案&nbsp;<Tooltip title="友情提示：以英文标点逗号分隔"><Icon type="info-circle-o" /></Tooltip></span>)}>
-              {getFieldDecorator('solution', {
+            <FormItem {...formItemLayout} label="主题">
+              {getFieldDecorator('topic', {
                 rules: customRules,
-                initialValue: this.state.solution,
-              })(<Input placeholder="账户系统,计价系统,地图导航,钱包系统" />)}
+                initialValue: this.state.topic,
+              })(<Input placeholder="请输入活动主题" />)}
             </FormItem>
 
-            <FormItem {...formItemLayout} label="详情正文">
-              {getFieldDecorator('mainbody', {
+            <FormItem {...formItemLayout} label="活动详情正文">
+              {getFieldDecorator('content', {
                 rules: customRules,
-                initialValue: this.state.mainbody,
+                initialValue: this.state.content,
               })(
                 <TextArea
-                  placeholder="请录入 MarkDown 格式的项目正文"
+                  placeholder="请录入 MarkDown 格式的活动详情正文"
                   autosize={{ minRows: 6, maxRows: 20 }}
                 />
               )}
             </FormItem>
           </Form>
         </Modal>
-
-        <CaseCommentModal
-          visible={this.state.commentModalVisible}
-          record={this.state.commentModalRecord}
-          commentList={this.state.commentModalComment}
-          addComment={this.handleAddComment}
-          deleteComment={this.handleDeleteComment}
-          onCancel={this.commentModalClose}
-          update={record => this.handleUpdateComment(record)}
-        />
       </PageHeaderLayout>
     );
   }

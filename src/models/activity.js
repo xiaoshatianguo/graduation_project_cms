@@ -1,4 +1,8 @@
-import { queryCase, updateCase, createCase, deleteCase } from '../services/activity';
+/**
+ * 活动信息管理
+ */
+
+import { queryActivity, updateActivity, createActivity, deleteActivity } from '../services/activity';
 
 export default {
   namespace: 'activity',
@@ -11,21 +15,21 @@ export default {
 
   effects: {
     *fetch({ payload }, { call, put }) {
-      const response = yield call(queryCase, payload);
+      const response = yield call(queryActivity, payload);
       yield put({
         type: 'save',
         payload: response,
       });
     },
     *put({ payload }, { call, put }) {
-      const response = yield call(updateCase, payload);
+      const response = yield call(updateActivity, payload);
       yield put({
         type: 'updete',
         payload: response,
       });
     },
     *add({ payload }, { call, put }) {
-      const response = yield call(createCase, payload);
+      const response = yield call(createActivity, payload);
       // type: 'append' 与 *add 不能重名，会触发重复的接口请求
       yield put({
         type: 'append',
@@ -33,7 +37,7 @@ export default {
       });
     },
     *delete({ payload }, { call }) {
-      yield call(deleteCase, payload);
+      yield call(deleteActivity, payload);
     },
   },
 
