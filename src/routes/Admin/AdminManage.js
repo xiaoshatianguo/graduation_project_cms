@@ -18,6 +18,7 @@ import moment from 'moment';
 import PageHeaderLayout from '../../layouts/PageHeaderLayout';
 import UploadImgs from '../../components/UploadImgs/UploadImgs';
 import { qiniuDomain } from '../../utils/appConfig';
+import { pageableSize } from '../../utils/appConfig';
 
 const FormItem = Form.Item;
 const Option = Select.Option;
@@ -66,6 +67,7 @@ export class AdminManage extends Component {
     tableCurIndex: '', // 当前编辑的行数
     currentPage: 1, // 当前页数
     curPageSize: 10, // 当前页面的条数
+    isTableDataLoading: false,
   };
 
   
@@ -92,8 +94,12 @@ export class AdminManage extends Component {
   };
 
   handleRowEditClick = (index, record) => {
-    const { id = -1, number, nick_name, password, sex, integral, manage_categories, status } = record;
+    let { id = -1, number, nick_name, password, sex, integral, manage_categories, status } = record;
     this.tableCurIndex = index;
+
+    sex += '';
+    integral += '';
+    manage_categories += '';
 
     this.setState({
       id,
@@ -104,16 +110,6 @@ export class AdminManage extends Component {
       editFormTitle: '编辑信息',
       editFormFlag: 'update',
       tableCurIndex: index,
-    });
-
-    this.props.form.setFieldsValue({
-      number,
-      nick_name,
-      password,
-      sex,
-      integral,
-      manage_categories,
-      status
     });
   };
 
@@ -226,6 +222,28 @@ export class AdminManage extends Component {
 
     this.setState({ currentPage: current });
   };
+
+  /**
+   * 处理查询按钮点击事件
+   */
+  handleSearchSubmit = () => {
+    let {
+      integral = '',
+      manage_categories= '',
+    } = this.state;
+    
+    const { currentPage, curPageSize } = this.state;
+    
+    this.props.dispatch({
+      type: 'admin/fetch',
+      payload: {
+        currentPage,
+        curPageSize,
+        integral,
+        manage_categories
+      },
+    });
+  }
 
   render() {
     const columns = [
@@ -353,19 +371,40 @@ export class AdminManage extends Component {
         <Card>
           <Row gutter={24}>
             <Col span={3}>
-              <h4>管理员编号：</h4>
+              <h4>管理员权限：</h4>
             </Col>
             <Col span={4}>
-              <Input />
+              <Select
+                  allowClear={true}
+                  placeholder="选择管理员权限"
+                  style={{ width: 150}}
+                  onChange={(value) => {
+                      this.setState({integral: value});
+                  }}
+              >
+                <Option value="0">超级管理员</Option>
+                <Option value="1">普通管理员</Option>
+              </Select>
             </Col>
             <Col span={3}>
-              <h4>管理员昵称：</h4>
+              <h4>管理员类别：</h4>
             </Col>
             <Col span={4}>
-              <Input />
+              <Select
+                  allowClear={true}
+                  placeholder="选择管理员类别"
+                  style={{ width: 150}}
+                  onChange={(value) => {
+                      this.setState({manage_categories: value});
+                  }}
+              >
+                <Option value="0">人物摄影类</Option>
+                <Option value="1">动物摄影类</Option>
+                <Option value="2">植物摄影类</Option>
+              </Select>
             </Col>
             <Col span={2}>
-              <Button icon="search">查询</Button>
+              <Button icon="search" loading={this.state.isTableDataLoading} htmlType="submit" onClick={this.handleSearchSubmit}>查询</Button>
             </Col>
             <Col span={4} offset={2}>
               <Button type="primary" icon="plus" onClick={() => this.handleModalVisible(true)}>
