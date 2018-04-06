@@ -20,6 +20,23 @@ import UploadImgs from '../../components/UploadImgs/UploadImgs';
 import { qiniuDomain } from '../../utils/appConfig';
 
 const FormItem = Form.Item;
+const Option = Select.Option;
+
+let sexList = {
+  '0': '男',
+  '1': '女',
+};
+
+let integralList = {
+  '0': '超级管理员',
+  '1': '普通管理员',
+};
+
+let categoriesList = {
+  '0': '人物摄影类',
+  '1': '动物摄影类',
+  '2': '植物摄影类',
+};
 
 // 连接model层的state数据，然后通过this.props.state名(namespace)访问model层的state数据
 @connect(({ admin, loading }) => ({
@@ -51,6 +68,8 @@ export class AdminManage extends Component {
     curPageSize: 10, // 当前页面的条数
   };
 
+  
+
   componentDidMount = () => {
     const { currentPage, curPageSize } = this.state;
 
@@ -78,6 +97,9 @@ export class AdminManage extends Component {
 
     this.setState({
       id,
+      sex,
+      integral,
+      manage_categories,
       modalVisible: true,
       editFormTitle: '编辑信息',
       editFormFlag: 'update',
@@ -226,16 +248,25 @@ export class AdminManage extends Component {
         title: '性别',
         className: 'ant-tableThead',
         dataIndex: 'sex',
+        render: (text) => {
+          return <span>{ sexList[text] }</span>;
+        },
       },
       {
         title: '权限',
         className: 'ant-tableThead',
         dataIndex: 'integral',
+        render: (text) => {
+          return <span>{ integralList[text] }</span>;
+        },
       },
       {
         title: '管理类别',
         className: 'ant-tableThead',
         dataIndex: 'manage_categories',
+        render: (text) => {
+          return <span>{ categoriesList[text] }</span>;
+        },
       },
       {
         title: '创建时间',
@@ -243,7 +274,7 @@ export class AdminManage extends Component {
         dataIndex: 'create_time',
         width: 160,
         render: (text) => {
-          return <span>{moment(text).format('YYYY-MM-DD')}</span>;
+          return <span>{moment(text).format('YYYY-MM-DD HH:MM:SS')}</span>;
         },
       },
       {
@@ -252,7 +283,7 @@ export class AdminManage extends Component {
         dataIndex: 'lastest_login_time',
         width: 160,
         render: (text) => {
-          return <span>{moment(text).format('YYYY-MM-DD')}</span>;
+          return <span>{ !!text ? moment(text).format('YYYY-MM-DD HH:MM:SS') : '-'}</span>;
         },
       },
       {
@@ -392,21 +423,37 @@ export class AdminManage extends Component {
               {getFieldDecorator('sex', {
                 rules: customRules,
                 initialValue: this.state.sex,
-              })(<Input />)}
+              })(
+              <Select>
+                <Option value="0">男</Option>
+                <Option value="1">女</Option>
+              </Select>
+            )}
             </FormItem>
 
             <FormItem {...formItemLayout} label="权限">
               {getFieldDecorator('integral', {
                 rules: customRules,
                 initialValue: this.state.integral,
-              })(<Input />)}
+              })(
+                <Select>
+                  <Option value="0">超级管理员</Option>
+                  <Option value="1">普通管理员</Option>
+                </Select>
+              )}
             </FormItem>
 
             <FormItem {...formItemLayout} label="管理类别">
               {getFieldDecorator('manage_categories', {
                 rules: customRules,
                 initialValue: this.state.manage_categories,
-              })(<Input />)}
+              })(
+                <Select>
+                  <Option value="0">人物摄影类</Option>
+                  <Option value="1">动物摄影类</Option>
+                  <Option value="2">植物摄影类</Option>
+                </Select>
+              )}
             </FormItem>
           </Form>
         </Modal>
