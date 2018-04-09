@@ -63,14 +63,14 @@ export class AdminManage extends Component {
     manage_categories: '',
     status: '',
 
+    searchCategories: '',
+    searchIntegral: '',
+
     editFormFlag: '', // 信息框的标记，add--添加，update--更新
     tableCurIndex: '', // 当前编辑的行数
     currentPage: 1, // 当前页数
     curPageSize: 10, // 当前页面的条数
-    isTableDataLoading: false,
   };
-
-  
 
   componentDidMount = () => {
     const { currentPage, curPageSize } = this.state;
@@ -110,6 +110,15 @@ export class AdminManage extends Component {
       editFormTitle: '编辑信息',
       editFormFlag: 'update',
       tableCurIndex: index,
+    });
+
+    this.props.form.setFieldsValue({
+      number,
+      nick_name,
+      password,
+      sex,
+      integral,
+      manage_categories,
     });
   };
 
@@ -228,8 +237,8 @@ export class AdminManage extends Component {
    */
   handleSearchSubmit = () => {
     let {
-      integral = '',
-      manage_categories= '',
+      searchIntegral = '',
+      searchCategories= '',
     } = this.state;
     
     const { currentPage, curPageSize } = this.state;
@@ -239,8 +248,8 @@ export class AdminManage extends Component {
       payload: {
         currentPage,
         curPageSize,
-        integral,
-        manage_categories
+        integral: searchIntegral,
+        manage_categories: searchCategories,
       },
     });
   }
@@ -379,7 +388,7 @@ export class AdminManage extends Component {
                   placeholder="选择管理员权限"
                   style={{ width: 150}}
                   onChange={(value) => {
-                      this.setState({integral: value});
+                      this.setState({searchIntegral: value});
                   }}
               >
                 <Option value="0">超级管理员</Option>
@@ -395,7 +404,7 @@ export class AdminManage extends Component {
                   placeholder="选择管理员类别"
                   style={{ width: 150}}
                   onChange={(value) => {
-                      this.setState({manage_categories: value});
+                      this.setState({searchCategories: value});
                   }}
               >
                 <Option value="0">人物摄影类</Option>
@@ -404,7 +413,7 @@ export class AdminManage extends Component {
               </Select>
             </Col>
             <Col span={2}>
-              <Button icon="search" loading={this.state.isTableDataLoading} htmlType="submit" onClick={this.handleSearchSubmit}>查询</Button>
+              <Button icon="search" htmlType="submit" onClick={this.handleSearchSubmit}>查询</Button>
             </Col>
             <Col span={4} offset={2}>
               <Button type="primary" icon="plus" onClick={() => this.handleModalVisible(true)}>

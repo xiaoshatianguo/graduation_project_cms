@@ -9,6 +9,7 @@ import {
   Table,
   Popconfirm,
   InputNumber,
+  DatePicker,
   Modal,
   Form,
   Select,
@@ -23,11 +24,20 @@ import { qiniuDomain } from '../../utils/appConfig';
 
 const FormItem = Form.Item;
 const { TextArea } = Input;
+const Option = Select.Option;
+const { RangePicker } = DatePicker;
+
+let categoriesList = {
+  '0': '人物摄影类',
+  '1': '动物摄影类',
+  '2': '植物摄影类',
+};
 
 @connect(({ activity, loading }) => ({
   activity,
   loading: loading.models.activity,
 }))
+
 @Form.create()
 export class ActivityInfo extends Component {
   state = {
@@ -45,6 +55,9 @@ export class ActivityInfo extends Component {
     end_time: '',
     status: '',
     auditor: '',
+
+    searchName: '',
+    searchSort: '',
 
     editFormFlag: '', // 信息框的标记，add--添加，update--更新
     tableCurIndex: '', // 当前编辑的行数
@@ -72,7 +85,7 @@ export class ActivityInfo extends Component {
   };
 
   handleRowEditClick = (index, record) => {
-    const {
+    let {
       id = -1,
       number,
       name,
@@ -85,6 +98,8 @@ export class ActivityInfo extends Component {
       status,
       auditor,
     } = record;
+
+    sort += '';
 
     this.tableCurIndex = index;
 
@@ -145,6 +160,13 @@ export class ActivityInfo extends Component {
     const { editFormFlag, id } = this.state;
 
     this.props.form.validateFieldsAndScroll(async (err, values) => {
+      const rangeTimeValue = values['range-time-picker'];
+
+      values.start_time = rangeTimeValue[0].format('YYYY-MM-DD HH:mm:ss');
+      values.end_time = rangeTimeValue[1].format('YYYY-MM-DD HH:mm:ss');
+
+      delete values['range-time-picker'];
+
       if (!err) {
         if (editFormFlag === 'add') {
           await this.props.dispatch({
@@ -218,6 +240,28 @@ export class ActivityInfo extends Component {
     this.setState({ currentPage: current });
   };
 
+  /**
+   * 处理查询按钮点击事件
+   */
+  handleSearchSubmit = () => {
+    let {
+      searchName = '',
+      searchSort = '',
+    } = this.state;
+    
+    const { currentPage, curPageSize } = this.state;
+    
+    this.props.dispatch({
+      type: 'admin/fetch',
+      payload: {
+        currentPage,
+        curPageSize,
+        name: searchName,
+        sort: searchSort,
+      },
+    });
+  }
+
   render() {
     const columns = [
       {
@@ -239,6 +283,9 @@ export class ActivityInfo extends Component {
         title: '类别',
         className: 'ant-tableThead',
         dataIndex: 'sort',
+        render: (text) => {
+          return <span>{ categoriesList[text] }</span>;
+        },
       },
       {
         title: '主题',
@@ -250,7 +297,7 @@ export class ActivityInfo extends Component {
         className: 'ant-tableThead',
         dataIndex: 'start_time',
         render: (text) => {
-          return <span>{moment(text).format('YYYY-MM-DD')}</span>;
+          return <span>{moment(text).format('YYYY-MM-DD HH:MM:SS')}</span>;
         },
       },
       {
@@ -258,7 +305,7 @@ export class ActivityInfo extends Component {
         className: 'ant-tableThead',
         dataIndex: 'end_time',
         render: (text) => {
-          return <span>{moment(text).format('YYYY-MM-DD')}</span>;
+          return <span>{moment(text).format('YYYY-MM-DD HH:MM:SS')}</span>;
         },
       },
       {
@@ -266,7 +313,7 @@ export class ActivityInfo extends Component {
         className: 'ant-tableThead',
         dataIndex: 'create_time',
         render: (text) => {
-          return <span>{moment(text).format('YYYY-MM-DD')}</span>;
+          return <span>{moment(text).format('YYYY-MM-DD HH:MM:SS')}</span>;
         },
       },
       {
@@ -321,6 +368,7 @@ export class ActivityInfo extends Component {
 
     const { loading } = this.props;
     const { modalVisible, editFormTitle, currentPage, curPageSize, tableDataTotal } = this.state;
+
     return (
       <PageHeaderLayout
         title="活动管理"
@@ -328,14 +376,31 @@ export class ActivityInfo extends Component {
       >
         <Card>
           <Row gutter={24}>
-            <Col span={2}>
-              <h4>活动名称：</h4>
+            <Col span={3}>
+              <h4>活动发起人：</h4>
             </Col>
             <Col span={4}>
               <Input />
             </Col>
-            <Col span={8}>
-              <Button icon="search">查询</Button>
+            <Col span={3}>
+              <h4>活动类别：</h4>
+            </Col>
+            <Col span={4}>
+              <Select
+                  allowClear={true}
+                  placeholder="选择活动类别"
+                  style={{ width: 150}}
+                  onChange={(value) => {
+                      this.setState({searchSort: value});
+                  }}
+              >
+                <Option value="0">人物摄影类</Option>
+                <Option value="1">动物摄影类</Option>
+                <Option value="2">植物摄影类</Option>
+              </Select>
+            </Col>
+            <Col span={2}>
+              <Button icon="search" htmlType="submit" onClick={this.handleSearchSubmit}>查询</Button>
             </Col>
             <Col span={4} offset={4}>
               <Button type="primary" icon="plus" onClick={() => this.handleModalVisible(true)}>
@@ -393,7 +458,13 @@ export class ActivityInfo extends Component {
               {getFieldDecorator('sort', {
                 rules: customRules,
                 initialValue: this.state.sort,
-              })(<Input placeholder="请输入活动类别" />)}
+              })(
+                <Select>
+                  <Option value="0">人物摄影类</Option>
+                  <Option value="1">动物摄影类</Option>
+                  <Option value="2">植物摄影类</Option>
+                </Select>
+              )}
             </FormItem>
 
             <FormItem {...formItemLayout} label="主题">
@@ -401,6 +472,17 @@ export class ActivityInfo extends Component {
                 rules: customRules,
                 initialValue: this.state.topic,
               })(<Input placeholder="请输入活动主题" />)}
+            </FormItem>
+
+            <FormItem {...formItemLayout} label="活动时间">
+              {getFieldDecorator('range-time-picker', {
+                rules: customRules,
+                initialValue: [this.state.start_time, this.state.end_time],
+              })(
+                <RangePicker 
+                  showTime
+                />
+              )}
             </FormItem>
 
             <FormItem {...formItemLayout} label="活动详情正文">
