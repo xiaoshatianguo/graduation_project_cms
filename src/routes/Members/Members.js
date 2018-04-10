@@ -20,6 +20,12 @@ import UploadImgs from '../../components/UploadImgs/UploadImgs';
 import { qiniuDomain } from '../../utils/appConfig';
 
 const FormItem = Form.Item;
+const Option = Select.Option;
+
+let sexList = {
+  '0': '男',
+  '1': '女',
+};
 
 // 连接model层的state数据，然后通过this.props.state名(namespace)访问model层的state数据
 @connect(({ members, loading }) => ({
@@ -76,7 +82,7 @@ export class MembersManage extends Component {
   };
 
   handleRowEditClick = (index, record) => {
-    const { 
+    let { 
       id = -1, 
       number,
       email,
@@ -93,6 +99,8 @@ export class MembersManage extends Component {
       status,
     } = record;
     this.tableCurIndex = index;
+
+    sex += '';
 
     this.setState({
       id,
@@ -127,7 +135,7 @@ export class MembersManage extends Component {
       tableData,
     });
 
-    message.info(`《${record.number}${record.nickname}》已删除 ☠️`);
+    message.info(`${record.number}${record.nickname}已删除 ☠️`);
   };
 
   handleModalVisible = (flag) => {
@@ -228,62 +236,86 @@ export class MembersManage extends Component {
         title: '编号',
         className: 'ant-tableThead',
         dataIndex: 'number',
+        width: 80,
+        fixed: 'left',
       },
       {
         title: '昵称',
         className: 'ant-tableThead',
         dataIndex: 'nickname',
+        width: 100,
+        fixed: 'left',
       },
       {
         title: '真实名字',
         className: 'ant-tableThead',
         dataIndex: 'name',
+        width: 100,
+        fixed: 'left',
       },
       {
         title: '邮箱',
         className: 'ant-tableThead',
         dataIndex: 'email',
+        width: 150,
       },
       {
         title: '手机',
         className: 'ant-tableThead',
         dataIndex: 'phone',
+        width: 150,
       },
       {
         title: '密码',
         className: 'ant-tableThead',
         dataIndex: 'password',
+        width: 150,
       },
       
       {
         title: '性别',
         className: 'ant-tableThead',
         dataIndex: 'sex',
+        width: 150,
+        render: (text) => {
+          return <span>{ sexList[text] }</span>;
+        },
       },
       {
         title: '年龄',
         className: 'ant-tableThead',
         dataIndex: 'age',
+        width: 150,
+        render: (text) => {
+          return <span>{ text }岁</span>;
+        },
       },
       {
         title: '地址',
         className: 'ant-tableThead',
         dataIndex: 'address',
+        width: 150,
       },
       {
         title: '头像',
         className: 'ant-tableThead',
         dataIndex: 'portrait',
+        width: 150,
+        render: (text) => {
+          return <Avatar shape="square" src={text} size="large" />;
+        },
       },
       {
         title: '宣言',
         className: 'ant-tableThead',
         dataIndex: 'personal_statement',
+        width: 150,
       },
       {
         title: '积分',
         className: 'ant-tableThead',
         dataIndex: 'integral',
+        width: 150,
       },
       {
         title: '创建时间',
@@ -291,7 +323,7 @@ export class MembersManage extends Component {
         dataIndex: 'create_time',
         width: 160,
         render: (text) => {
-          return <span>{moment(text).format('YYYY-MM-DD')}</span>;
+          return <span>{moment(text).format('YYYY-MM-DD HH:mm:ss')}</span>;
         },
       },
       {
@@ -300,7 +332,7 @@ export class MembersManage extends Component {
         dataIndex: 'lastest_login_time',
         width: 160,
         render: (text) => {
-          return <span>{moment(text).format('YYYY-MM-DD')}</span>;
+          return <span>{moment(text).format('YYYY-MM-DD HH:mm:ss')}</span>;
         },
       },
       {
@@ -308,6 +340,7 @@ export class MembersManage extends Component {
         className: 'ant-tableThead',
         key: 'action',
         width: 300,
+        fixed: 'right',
         render: (text, record, index) => {
           const { id = -1 } = record;
 
@@ -318,7 +351,7 @@ export class MembersManage extends Component {
               </Button>
               <span className="ant-divider" />
 
-              <Popconfirm
+              {/* <Popconfirm
                 title="确定要删除吗？"
                 placement="topRight"
                 onConfirm={() => this.handleRowDeleteClick(id, index, record)}
@@ -326,7 +359,7 @@ export class MembersManage extends Component {
                 <Button type="danger" icon="delete">
                   删除
                 </Button>
-              </Popconfirm>
+              </Popconfirm> */}
             </span>
           );
         },
@@ -397,6 +430,7 @@ export class MembersManage extends Component {
             columns={columns}
             rowKey={record => record.id || 0}
             dataSource={this.state.tableData}
+            scroll={{ x: 2500 }}
             loading={loading}
             pagination={{
               current: currentPage,
@@ -447,7 +481,12 @@ export class MembersManage extends Component {
               {getFieldDecorator('sex', {
                 rules: customRules,
                 initialValue: this.state.sex,
-              })(<Input />)}
+              })(
+                <Select>
+                  <Option value="0">男</Option>
+                  <Option value="1">女</Option>
+                </Select>
+              )}
             </FormItem>
 
             <FormItem {...formItemLayout} label="积分">
