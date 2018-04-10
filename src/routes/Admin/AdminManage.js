@@ -137,7 +137,7 @@ export class AdminManage extends Component {
       tableData,
     });
 
-    message.info(`《${record.number}${record.nick_name}》已删除 ☠️`);
+    message.info(`${record.number}${record.nick_name}已删除`);
   };
 
   handleModalVisible = (flag) => {
@@ -301,7 +301,7 @@ export class AdminManage extends Component {
         dataIndex: 'create_time',
         width: 160,
         render: (text) => {
-          return <span>{moment(text).format('YYYY-MM-DD HH:MM:SS')}</span>;
+          return <span>{moment(text).format('YYYY-MM-DD HH:mm:ss')}</span>;
         },
       },
       {
@@ -310,7 +310,7 @@ export class AdminManage extends Component {
         dataIndex: 'lastest_login_time',
         width: 160,
         render: (text) => {
-          return <span>{ !!text ? moment(text).format('YYYY-MM-DD HH:MM:SS') : '-'}</span>;
+          return <span>{ !!text ? moment(text).format('YYYY-MM-DD HH:mm:ss') : '-'}</span>;
         },
       },
       {

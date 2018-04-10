@@ -99,10 +99,10 @@ export class ActivityInfo extends Component {
       auditor,
     } = record;
 
-    sort += '';
-
     this.tableCurIndex = index;
 
+    sort += '';
+    
     this.setState({
       id,
       modalVisible: true,
@@ -138,7 +138,7 @@ export class ActivityInfo extends Component {
       tableData,
     });
 
-    message.info(`《${record.name}》已删除 ☠️`);
+    message.info(`${record.name} 已删除`);
   };
 
   handleModalVisible = (flag) => {
@@ -252,7 +252,7 @@ export class ActivityInfo extends Component {
     const { currentPage, curPageSize } = this.state;
     
     this.props.dispatch({
-      type: 'admin/fetch',
+      type: 'activity/fetch',
       payload: {
         currentPage,
         curPageSize,
@@ -261,6 +261,17 @@ export class ActivityInfo extends Component {
       },
     });
   }
+
+  handleInputChange = (event) => {
+    const target = event.target;
+    const value = target.type === 'checkbox' ? target.checked : target.value;
+    const name = target.name;
+    console.log(typeof(value));
+
+    this.setState({
+        [name]: value
+    });
+}
 
   render() {
     const columns = [
@@ -297,7 +308,7 @@ export class ActivityInfo extends Component {
         className: 'ant-tableThead',
         dataIndex: 'start_time',
         render: (text) => {
-          return <span>{moment(text).format('YYYY-MM-DD HH:MM:SS')}</span>;
+          return <span>{moment(text).format('YYYY-MM-DD HH:mm:ss')}</span>;
         },
       },
       {
@@ -305,7 +316,7 @@ export class ActivityInfo extends Component {
         className: 'ant-tableThead',
         dataIndex: 'end_time',
         render: (text) => {
-          return <span>{moment(text).format('YYYY-MM-DD HH:MM:SS')}</span>;
+          return <span>{moment(text).format('YYYY-MM-DD HH:mm:ss')}</span>;
         },
       },
       {
@@ -313,7 +324,7 @@ export class ActivityInfo extends Component {
         className: 'ant-tableThead',
         dataIndex: 'create_time',
         render: (text) => {
-          return <span>{moment(text).format('YYYY-MM-DD HH:MM:SS')}</span>;
+          return <span>{moment(text).format('YYYY-MM-DD HH:mm:ss')}</span>;
         },
       },
       {
@@ -380,7 +391,10 @@ export class ActivityInfo extends Component {
               <h4>活动发起人：</h4>
             </Col>
             <Col span={4}>
-              <Input />
+              <Input 
+                name="searchName"
+                onChange={this.handleInputChange}
+              />
             </Col>
             <Col span={3}>
               <h4>活动类别：</h4>
@@ -477,7 +491,6 @@ export class ActivityInfo extends Component {
             <FormItem {...formItemLayout} label="活动时间">
               {getFieldDecorator('range-time-picker', {
                 rules: customRules,
-                initialValue: [this.state.start_time, this.state.end_time],
               })(
                 <RangePicker 
                   showTime

@@ -24,6 +24,12 @@ import { qiniuDomain } from '../../utils/appConfig';
 const FormItem = Form.Item;
 const { TextArea } = Input;
 
+let categoriesList = {
+  '0': '人物摄影类',
+  '1': '动物摄影类',
+  '2': '植物摄影类',
+};
+
 @connect(({ activity, loading }) => ({
   activity,
   loading: loading.models.activity,
@@ -72,7 +78,7 @@ export class ActivityChecked extends Component {
   };
 
   handleRowEditClick = (index, record) => {
-    const {
+    let {
       id = -1,
       number,
       name,
@@ -85,6 +91,8 @@ export class ActivityChecked extends Component {
       status,
       auditor,
     } = record;
+
+    sort += '';
 
     this.tableCurIndex = index;
 
@@ -203,6 +211,9 @@ export class ActivityChecked extends Component {
         title: '类别',
         className: 'ant-tableThead',
         dataIndex: 'sort',
+        render: (text) => {
+          return <span>{ categoriesList[text] }</span>;
+        },
       },
       {
         title: '主题',
@@ -214,7 +225,7 @@ export class ActivityChecked extends Component {
         className: 'ant-tableThead',
         dataIndex: 'start_time',
         render: (text) => {
-          return <span>{moment(text).format('YYYY-MM-DD')}</span>;
+          return <span>{moment(text).format('YYYY-MM-DD HH:mm:ss')}</span>;
         },
       },
       {
@@ -222,7 +233,7 @@ export class ActivityChecked extends Component {
         className: 'ant-tableThead',
         dataIndex: 'end_time',
         render: (text) => {
-          return <span>{moment(text).format('YYYY-MM-DD')}</span>;
+          return <span>{moment(text).format('YYYY-MM-DD HH:mm:ss')}</span>;
         },
       },
       {
@@ -230,7 +241,7 @@ export class ActivityChecked extends Component {
         className: 'ant-tableThead',
         dataIndex: 'create_time',
         render: (text) => {
-          return <span>{moment(text).format('YYYY-MM-DD')}</span>;
+          return <span>{moment(text).format('YYYY-MM-DD HH:mm:ss')}</span>;
         },
       },
       {
