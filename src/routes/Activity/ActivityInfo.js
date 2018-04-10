@@ -16,6 +16,7 @@ import {
   message,
   Tooltip,
   Icon,
+  Switch,
 } from 'antd';
 import moment from 'moment';
 import PageHeaderLayout from '../../layouts/PageHeaderLayout';
@@ -55,6 +56,7 @@ export class ActivityInfo extends Component {
     end_time: '',
     status: '',
     auditor: '',
+    disabled: '',
 
     searchName: '',
     searchSort: '',
@@ -124,6 +126,35 @@ export class ActivityInfo extends Component {
     });
   };
 
+  handleRowSwitchClick = async (checked, record) => {
+    let message = '';
+
+    switch (checked) {
+      case false:
+      checked = 1*1;
+      message = "活动已禁用";
+        break;
+    
+      case true:
+      checked = 0*1;
+      message = "允许活动";
+        break;
+    
+      default:
+        break;
+    }
+
+    await this.props.dispatch({
+      type: 'activity/put',
+      payload: {
+        id: record.id,
+        disabled: checked,
+      },
+    });
+
+    message.success(message);
+  }
+
   handleRowDeleteClick = async (id, index, record) => {
     await this.props.dispatch({
       type: 'activity/delete',
@@ -163,8 +194,8 @@ export class ActivityInfo extends Component {
     this.props.form.validateFieldsAndScroll(async (err, values) => {
       const rangeTimeValue = values['range-time-picker'];
 
-      values.start_time = rangeTimeValue[0].format('YYYY-MM-DD HH:mm:ss');
-      values.end_time = rangeTimeValue[1].format('YYYY-MM-DD HH:mm:ss');
+      values.start_time = rangeTimeValue[0].format('x');
+      values.end_time = rangeTimeValue[1].format('x');
 
       delete values['range-time-picker'];
 
@@ -207,6 +238,7 @@ export class ActivityInfo extends Component {
 
     message.info(`新增活动成功`);
   };
+
   /**
    * 项目增加更新之后的处理方法，直接修改项目列表对应数据
    */
@@ -269,12 +301,15 @@ export class ActivityInfo extends Component {
     const target = event.target;
     const value = target.type === 'checkbox' ? target.checked : target.value;
     const name = target.name;
-    console.log(typeof(value));
 
     this.setState({
         [name]: value
     });
-}
+  }
+
+  disabledDate = (current) => {
+    return current && current < moment().endOf('day');
+  }
 
   render() {
     const columns = [
@@ -354,6 +389,14 @@ export class ActivityInfo extends Component {
                   删除
                 </Button>
               </Popconfirm>
+              <span className="ant-divider" />
+
+              <Switch 
+                checkedChildren='允许'
+                unCheckedChildren='禁用'
+                defaultChecked= { record.disabled === 0 }
+                onChange={checked => this.handleRowSwitchClick(checked, record)}
+              />,
             </span>
           );
         },
@@ -496,7 +539,13 @@ export class ActivityInfo extends Component {
                 rules: customRules,
               })(
                 <RangePicker 
-                  showTime
+                  disabledDate={this.disabledDate}
+                  showTime={{
+                    hideDisabledOptions: true,
+                    defaultValue: [moment('00:00:00', 'HH:mm:ss'), moment('23:59:59', 'HH:mm:ss')],
+                  }}
+                  format="YYYY-MM-DD HH:mm:ss"
+                  defaultValue={[moment('2015-01-01 00:00:00', 'YYYY-MM-DD HH:mm:ss'), moment('2015-01-01 00:00:00', 'YYYY-MM-DD HH:mm:ss')]}
                 />
               )}
             </FormItem>
