@@ -66,6 +66,7 @@ export class ActivityChecked extends Component {
       payload: {
         currentPage,
         curPageSize,
+        status: '1',
       },
     });
   };
@@ -184,6 +185,7 @@ export class ActivityChecked extends Component {
       payload: {
         currentPage: current,
         curPageSize,
+        status: '1',
       },
     });
 

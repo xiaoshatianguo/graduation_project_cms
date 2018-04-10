@@ -73,6 +73,7 @@ export class ActivityInfo extends Component {
       payload: {
         currentPage,
         curPageSize,
+        status: '0',
       },
     });
   };
@@ -234,6 +235,7 @@ export class ActivityInfo extends Component {
       payload: {
         currentPage: current,
         curPageSize,
+        status: '0',
       },
     });
 
@@ -258,6 +260,7 @@ export class ActivityInfo extends Component {
         curPageSize,
         name: searchName,
         sort: searchSort,
+        status: '0',
       },
     });
   }
