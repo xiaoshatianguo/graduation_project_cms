@@ -13,6 +13,7 @@ import {
   message,
   Avatar,
   Select,
+  Switch,
 } from 'antd';
 import moment from 'moment';
 import PageHeaderLayout from '../../layouts/PageHeaderLayout';
@@ -121,6 +122,35 @@ export class AdminManage extends Component {
       manage_categories,
     });
   };
+
+  handleRowSwitchClick = async (checked, record) => {
+    let message = '';
+
+    switch (checked) {
+      case false:
+      checked = 1*1;
+      message = "管理员已禁用";
+        break;
+    
+      case true:
+      checked = 0*1;
+      message = "管理员恢复权限";
+        break;
+    
+      default:
+        break;
+    }
+
+    await this.props.dispatch({
+      type: 'admin/put',
+      payload: {
+        id: record.id,
+        status: checked,
+      },
+    });
+
+    message.success(message);
+  }
 
   handleRowDeleteClick = async (id, index, record) => {
     await this.props.dispatch({
@@ -337,6 +367,14 @@ export class AdminManage extends Component {
                   删除
                 </Button>
               </Popconfirm>
+              <span className="ant-divider" />
+
+              <Switch 
+                checkedChildren='允许'
+                unCheckedChildren='禁用'
+                defaultChecked= { record.status === 0 }
+                onChange={checked => this.handleRowSwitchClick(checked, record)}
+              />
             </span>
           );
         },
