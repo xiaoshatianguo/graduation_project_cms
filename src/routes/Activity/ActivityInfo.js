@@ -396,7 +396,7 @@ export class ActivityInfo extends Component {
                 unCheckedChildren='禁用'
                 defaultChecked= { record.disabled === 0 }
                 onChange={checked => this.handleRowSwitchClick(checked, record)}
-              />,
+              />
             </span>
           );
         },
@@ -544,8 +544,6 @@ export class ActivityInfo extends Component {
                     hideDisabledOptions: true,
                     defaultValue: [moment('00:00:00', 'HH:mm:ss'), moment('23:59:59', 'HH:mm:ss')],
                   }}
-                  format="YYYY-MM-DD HH:mm:ss"
-                  defaultValue={[moment('2015-01-01 00:00:00', 'YYYY-MM-DD HH:mm:ss'), moment('2015-01-01 00:00:00', 'YYYY-MM-DD HH:mm:ss')]}
                 />
               )}
             </FormItem>
