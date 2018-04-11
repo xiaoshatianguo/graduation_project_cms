@@ -68,6 +68,7 @@ export class MembersManage extends Component {
       payload: {
         currentPage,
         curPageSize,
+        sort: '0',
       },
     });
   };
@@ -114,11 +115,47 @@ export class MembersManage extends Component {
       number,
       email,
       phone,
+      password,
       nickname,
+      name,
       sex,
+      age,
+      address,
+      portrait,
+      personal_statement,
       integral,
+      status,
     });
   };
+
+  handleRowSwitchClick = async (checked, record) => {
+    let message = '';
+
+    switch (checked) {
+      case false:
+      checked = 1*1;
+      message = "用户已禁用";
+        break;
+    
+      case true:
+      checked = 0*1;
+      message = "用户正常";
+        break;
+    
+      default:
+        break;
+    }
+
+    await this.props.dispatch({
+      type: 'activity/put',
+      payload: {
+        id: record.id,
+        status: checked,
+      },
+    });
+
+    message.success(message);
+  }
 
   handleRowDeleteClick = async (id, index, record) => {
     await this.props.dispatch({
@@ -224,11 +261,31 @@ export class MembersManage extends Component {
       payload: {
         currentPage: current,
         curPageSize,
+        sort: '0',
       },
     });
 
     this.setState({ currentPage: current });
   };
+
+  /**
+   * 处理查询按钮点击事件
+   */
+  handleSearchSubmit = () => {
+    let {
+    } = this.state;
+    
+    const { currentPage, curPageSize } = this.state;
+    
+    this.props.dispatch({
+      type: 'members/fetch',
+      payload: {
+        currentPage,
+        curPageSize,
+        sort: '0',
+      },
+    });
+  }
 
   render() {
     const columns = [
@@ -257,26 +314,26 @@ export class MembersManage extends Component {
         title: '邮箱',
         className: 'ant-tableThead',
         dataIndex: 'email',
-        width: 150,
+        width: 200,
       },
       {
         title: '手机',
         className: 'ant-tableThead',
         dataIndex: 'phone',
-        width: 150,
+        width: 120,
       },
       {
         title: '密码',
         className: 'ant-tableThead',
         dataIndex: 'password',
-        width: 150,
+        width: 100,
       },
       
       {
         title: '性别',
         className: 'ant-tableThead',
         dataIndex: 'sex',
-        width: 150,
+        width: 80,
         render: (text) => {
           return <span>{ sexList[text] }</span>;
         },
@@ -285,7 +342,7 @@ export class MembersManage extends Component {
         title: '年龄',
         className: 'ant-tableThead',
         dataIndex: 'age',
-        width: 150,
+        width: 80,
         render: (text) => {
           return <span>{ text }岁</span>;
         },
@@ -300,7 +357,7 @@ export class MembersManage extends Component {
         title: '头像',
         className: 'ant-tableThead',
         dataIndex: 'portrait',
-        width: 150,
+        width: 80,
         render: (text) => {
           return <Avatar shape="square" src={text} size="large" />;
         },
@@ -309,13 +366,13 @@ export class MembersManage extends Component {
         title: '宣言',
         className: 'ant-tableThead',
         dataIndex: 'personal_statement',
-        width: 150,
+        width: 200,
       },
       {
         title: '积分',
         className: 'ant-tableThead',
         dataIndex: 'integral',
-        width: 150,
+        width: 80,
       },
       {
         title: '创建时间',
@@ -332,7 +389,7 @@ export class MembersManage extends Component {
         dataIndex: 'lastest_login_time',
         width: 160,
         render: (text) => {
-          return <span>{moment(text).format('YYYY-MM-DD HH:mm:ss')}</span>;
+          return <span>{ !!text ? moment(text).format('YYYY-MM-DD HH:mm:ss') : '-' }</span>;
         },
       },
       {
@@ -351,15 +408,16 @@ export class MembersManage extends Component {
               </Button>
               <span className="ant-divider" />
 
-              {/* <Popconfirm
-                title="确定要删除吗？"
+              {/* TODO: 修改成禁用方法 */}
+              <Popconfirm
+                title="确定要禁用吗？"
                 placement="topRight"
                 onConfirm={() => this.handleRowDeleteClick(id, index, record)}
               >
                 <Button type="danger" icon="delete">
-                  删除
+                  禁用
                 </Button>
-              </Popconfirm> */}
+              </Popconfirm>
             </span>
           );
         },
@@ -427,10 +485,11 @@ export class MembersManage extends Component {
 
         <Row>
           <Table
+            width={800}
+            scroll={{ x: 1990 }}
             columns={columns}
             rowKey={record => record.id || 0}
             dataSource={this.state.tableData}
-            scroll={{ x: 2500 }}
             loading={loading}
             pagination={{
               current: currentPage,
@@ -463,6 +522,13 @@ export class MembersManage extends Component {
               })(<Input />)}
             </FormItem>
 
+            <FormItem {...formItemLayout} label="真实姓名">
+              {getFieldDecorator('name', {
+                rules: customRules,
+                initialValue: this.state.name,
+              })(<Input />)}
+            </FormItem>
+            
             <FormItem {...formItemLayout} label="邮箱">
               {getFieldDecorator('email', {
                 rules: customRules,
@@ -489,10 +555,45 @@ export class MembersManage extends Component {
               )}
             </FormItem>
 
+            <FormItem {...formItemLayout} label="年龄">
+              {getFieldDecorator('age', {
+                rules: customRules,
+                initialValue: this.state.age,
+              })(<Input />)}
+            </FormItem>
+
+            <FormItem {...formItemLayout} label="地址">
+              {getFieldDecorator('address', {
+                rules: customRules,
+                initialValue: this.state.address,
+              })(<Input />)}
+            </FormItem>
+
+            <FormItem {...formItemLayout} label="密码">
+              {getFieldDecorator('password', {
+                rules: customRules,
+                initialValue: this.state.password,
+              })(<Input />)}
+            </FormItem>
+
             <FormItem {...formItemLayout} label="积分">
               {getFieldDecorator('integral', {
                 rules: customRules,
                 initialValue: this.state.integral,
+              })(<Input />)}
+            </FormItem>
+
+            <FormItem {...formItemLayout} label="头像">
+              {getFieldDecorator('portrait', {
+                rules: customRules,
+                initialValue: this.state.portrait,
+              })(<Input />)}
+            </FormItem>
+
+            <FormItem {...formItemLayout} label="个人宣言">
+              {getFieldDecorator('personal_statement', {
+                rules: customRules,
+                initialValue: this.state.personal_statement,
               })(<Input />)}
             </FormItem>
           </Form>
