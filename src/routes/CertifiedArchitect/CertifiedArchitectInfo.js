@@ -13,8 +13,10 @@ import {
   Form,
   Select,
   message,
+  Avatar,
   Tooltip,
   Icon,
+  Switch,
 } from 'antd';
 import moment from 'moment';
 import PageHeaderLayout from '../../layouts/PageHeaderLayout';
@@ -23,11 +25,18 @@ import { qiniuDomain } from '../../utils/appConfig';
 
 const FormItem = Form.Item;
 const { TextArea } = Input;
+const Option = Select.Option;
+
+let sexList = {
+  '0': '男',
+  '1': '女',
+};
 
 @connect(({ certifiedArchitect, loading }) => ({
   certifiedArchitect,
   loading: loading.models.certifiedArchitect,
 }))
+
 @Form.create()
 export class CertifiedArchitectInfo extends Component {
   state = {
@@ -47,7 +56,9 @@ export class CertifiedArchitectInfo extends Component {
     portrait: '',
     personal_statement: '',
     integral: '',
+    disabled: '',
     status: '',
+    sort: '',
 
     editFormFlag: '', // 信息框的标记，add--添加，update--更新
     tableCurIndex: '', // 当前编辑的行数
@@ -63,6 +74,8 @@ export class CertifiedArchitectInfo extends Component {
       payload: {
         currentPage,
         curPageSize,
+        status: 0,
+        sort: 2
       },
     });
   };
@@ -75,7 +88,7 @@ export class CertifiedArchitectInfo extends Component {
   };
 
   handleRowEditClick = (index, record) => {
-    const {
+    let {
       id = -1,
       number,
       email,
@@ -89,10 +102,10 @@ export class CertifiedArchitectInfo extends Component {
       portrait,
       personal_statement,
       integral,
-      status,
     } = record;
-
     this.tableCurIndex = index;
+
+    sex += '';
 
     this.setState({
       id,
@@ -104,15 +117,48 @@ export class CertifiedArchitectInfo extends Component {
 
     this.props.form.setFieldsValue({
       number,
+      email,
+      phone,
+      password,
+      nickname,
       name,
-      initiator,
-      sort,
-      topic,
-      content,
-      start_time,
-      end_time,
+      sex,
+      age,
+      address,
+      portrait,
+      personal_statement,
+      integral
     });
   };
+
+  handleRowSwitchClick = async (checked, record) => {
+    let message = '';
+
+    switch (checked) {
+      case false:
+      checked = 1*1;
+      message = "认证师已禁用";
+        break;
+    
+      case true:
+      checked = 0*1;
+      message = "认证师正常";
+        break;
+    
+      default:
+        break;
+    }
+
+    await this.props.dispatch({
+      type: 'certifiedArchitect/put',
+      payload: {
+        id: record.id,
+        disabled: checked,
+      },
+    });
+
+    message.success(message);
+  }
 
   handleRowDeleteClick = async (id, index, record) => {
     await this.props.dispatch({
@@ -129,7 +175,7 @@ export class CertifiedArchitectInfo extends Component {
       tableData,
     });
 
-    message.info(`《${record.name}》已删除 ☠️`);
+    message.info(`《${record.name}》已删除 ☠`);
   };
 
   handleModalVisible = (flag) => {
@@ -218,11 +264,43 @@ export class CertifiedArchitectInfo extends Component {
       payload: {
         currentPage: current,
         curPageSize,
+        status: 0,
+        sort: 2
       },
     });
 
     this.setState({ currentPage: current });
   };
+
+  /**
+   * 处理查询按钮点击事件
+   */
+  handleSearchSubmit = () => {
+    let {
+    } = this.state;
+    
+    const { currentPage, curPageSize } = this.state;
+    
+    this.props.dispatch({
+      type: 'certifiedArchitect/fetch',
+      payload: {
+        currentPage,
+        curPageSize,
+        status: 0,
+        sort: 2
+      },
+    });
+  }
+
+  handleInputChange = (event) => {
+    const target = event.target;
+    const value = target.type === 'checkbox' ? target.checked : target.value;
+    const name = target.name;
+
+    this.setState({
+        [name]: value
+    });
+  }
 
   render() {
     const columns = [
@@ -230,69 +308,103 @@ export class CertifiedArchitectInfo extends Component {
         title: '编号',
         className: 'ant-tableThead',
         dataIndex: 'number',
+        width: 80,
+        fixed: 'left',
       },
       {
         title: '昵称',
         className: 'ant-tableThead',
         dataIndex: 'nickname',
+        width: 100,
+        fixed: 'left',
       },
       {
         title: '真实名字',
         className: 'ant-tableThead',
         dataIndex: 'name',
+        width: 100,
+        fixed: 'left',
       },
       {
         title: '邮箱',
         className: 'ant-tableThead',
         dataIndex: 'email',
+        width: 200,
       },
       {
         title: '手机',
         className: 'ant-tableThead',
         dataIndex: 'phone',
+        width: 120,
       },
       {
         title: '密码',
         className: 'ant-tableThead',
         dataIndex: 'password',
+        width: 100,
       },
       
       {
         title: '性别',
         className: 'ant-tableThead',
         dataIndex: 'sex',
+        width: 80,
+        render: (text) => {
+          return <span>{ sexList[text] }</span>;
+        },
       },
       {
         title: '年龄',
         className: 'ant-tableThead',
         dataIndex: 'age',
+        width: 80,
+        render: (text) => {
+          return <span>{ text }岁</span>;
+        },
       },
       {
         title: '地址',
         className: 'ant-tableThead',
         dataIndex: 'address',
+        width: 150,
       },
       {
         title: '头像',
         className: 'ant-tableThead',
         dataIndex: 'portrait',
+        width: 80,
+        render: (text) => {
+          return <Avatar shape="square" src={text} size="large" />;
+        },
       },
       {
         title: '宣言',
         className: 'ant-tableThead',
         dataIndex: 'personal_statement',
+        width: 200,
       },
       {
         title: '积分',
         className: 'ant-tableThead',
         dataIndex: 'integral',
+        width: 80,
       },
       {
         title: '创建时间',
         className: 'ant-tableThead',
         dataIndex: 'create_time',
+        width: 160,
         render: (text) => {
-          return <span>{moment(text).format('YYYY-MM-DD')}</span>;
+          return <span>{moment(text).format('YYYY-MM-DD HH:mm:ss')}</span>;
+        },
+      },
+      {
+        title: '最后登录时间',
+        className: 'ant-tableThead',
+        dataIndex: 'lastest_login_time',
+        width: 160,
+        render: (text) => {
+          return <span>{ !!text ? moment(text).format('YYYY-MM-DD HH:mm:ss') : '-' }</span>;
         },
       },
       {
@@ -300,6 +412,7 @@ export class CertifiedArchitectInfo extends Component {
         className: 'ant-tableThead',
         key: 'action',
         width: 300,
+        fixed: 'right',
         render: (text, record, index) => {
           const { id = -1 } = record;
 
@@ -310,15 +423,12 @@ export class CertifiedArchitectInfo extends Component {
               </Button>
               <span className="ant-divider" />
 
-              <Popconfirm
-                title="确定要删除吗？"
-                placement="topRight"
-                onConfirm={() => this.handleRowDeleteClick(id, index, record)}
-              >
-                <Button type="danger" icon="delete">
-                  删除
-                </Button>
-              </Popconfirm>
+              <Switch 
+                checkedChildren='正常'
+                unCheckedChildren='禁用'
+                defaultChecked= { record.disabled === 0 }
+                onChange={checked => this.handleRowSwitchClick(checked, record)}
+              />
             </span>
           );
         },
@@ -373,6 +483,8 @@ export class CertifiedArchitectInfo extends Component {
 
         <Row>
           <Table
+            width={800}
+            scroll={{ x: 1990 }}
             columns={columns}
             rowKey={record => record.id || 0}
             dataSource={this.state.tableData}
@@ -398,42 +510,89 @@ export class CertifiedArchitectInfo extends Component {
               {getFieldDecorator('number', {
                 rules: customRules,
                 initialValue: this.state.number,
-              })(<Input />)}
+              })(<Input placeholder="请输入编号" />)}
             </FormItem>
 
             <FormItem {...formItemLayout} label="昵称">
               {getFieldDecorator('nickname', {
                 rules: customRules,
                 initialValue: this.state.nickname,
-              })(<Input />)}
+              })(<Input placeholder="请输入昵称" />)}
             </FormItem>
 
+            <FormItem {...formItemLayout} label="真实姓名">
+              {getFieldDecorator('name', {
+                rules: customRules,
+                initialValue: this.state.name,
+              })(<Input placeholder="请输入真实姓名" />)}
+            </FormItem>
+            
             <FormItem {...formItemLayout} label="邮箱">
               {getFieldDecorator('email', {
                 rules: customRules,
                 initialValue: this.state.email,
-              })(<Input />)}
+              })(<Input placeholder="请输入邮箱" />)}
             </FormItem>
 
             <FormItem {...formItemLayout} label="手机">
               {getFieldDecorator('phone', {
                 rules: customRules,
                 initialValue: this.state.phone,
-              })(<Input />)}
+              })(<Input placeholder="请输入手机" />)}
             </FormItem>
 
             <FormItem {...formItemLayout} label="性别">
               {getFieldDecorator('sex', {
                 rules: customRules,
                 initialValue: this.state.sex,
-              })(<Input />)}
+              })(
+                <Select>
+                  <Option value="0">男</Option>
+                  <Option value="1">女</Option>
+                </Select>
+              )}
+            </FormItem>
+
+            <FormItem {...formItemLayout} label="年龄">
+              {getFieldDecorator('age', {
+                rules: customRules,
+                initialValue: this.state.age,
+              })(<Input placeholder="请输入年龄" />)}
+            </FormItem>
+
+            <FormItem {...formItemLayout} label="地址">
+              {getFieldDecorator('address', {
+                rules: customRules,
+                initialValue: this.state.address,
+              })(<Input placeholder="请输入地址" />)}
+            </FormItem>
+
+            <FormItem {...formItemLayout} label="密码">
+              {getFieldDecorator('password', {
+                rules: customRules,
+                initialValue: this.state.password,
+              })(<Input placeholder="请输入密码" />)}
             </FormItem>
 
             <FormItem {...formItemLayout} label="积分">
               {getFieldDecorator('integral', {
                 rules: customRules,
                 initialValue: this.state.integral,
-              })(<Input />)}
+              })(<Input placeholder="请输入积分" />)}
+            </FormItem>
+
+            <FormItem {...formItemLayout} label="头像">
+              {getFieldDecorator('portrait', {
+                rules: customRules,
+                initialValue: this.state.portrait,
+              })(<Input placeholder="请输入头像" />)}
+            </FormItem>
+
+            <FormItem {...formItemLayout} label="个人宣言">
+              {getFieldDecorator('personal_statement', {
+                rules: customRules,
+                initialValue: this.state.personal_statement,
+              })(<Input placeholder="请输入个人宣言" />)}
             </FormItem>
           </Form>
         </Modal>

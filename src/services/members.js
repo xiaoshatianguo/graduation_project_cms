@@ -4,7 +4,7 @@ import { apiPrefix } from '../utils/appConfig';
 
 /** 用户、认证师 RESTful 接口 */
 export async function queryUser(params) {
-  return request(`${apiPrefix}/api/user`);
+  return request(`${apiPrefix}/api/user?${stringify(params)}`);
 }
 
 export async function updateUser(params) {

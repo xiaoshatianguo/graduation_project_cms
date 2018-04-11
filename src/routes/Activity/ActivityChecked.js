@@ -35,6 +35,7 @@ let categoriesList = {
   activity,
   loading: loading.models.activity,
 }))
+
 @Form.create()
 export class ActivityChecked extends Component {
   state = {

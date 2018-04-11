@@ -13,6 +13,7 @@ import {
   message,
   Avatar,
   Select,
+  Switch,
 } from 'antd';
 import moment from 'moment';
 import PageHeaderLayout from '../../layouts/PageHeaderLayout';
@@ -52,6 +53,7 @@ export class MembersManage extends Component {
     portrait: '',
     personal_statement: '',
     integral: '',
+    disabled: '',
     status: '',
 
     editFormFlag: '', // 信息框的标记，add--添加，update--更新
@@ -76,6 +78,7 @@ export class MembersManage extends Component {
   componentWillReceiveProps = (nextProps) => {
     const { data } = nextProps.members;
     const { content = [], totalElements } = data;
+
     this.setState({
       tableData: content,
       tableDataTotal: totalElements,
@@ -97,7 +100,6 @@ export class MembersManage extends Component {
       portrait,
       personal_statement,
       integral,
-      status,
     } = record;
     this.tableCurIndex = index;
 
@@ -123,8 +125,7 @@ export class MembersManage extends Component {
       address,
       portrait,
       personal_statement,
-      integral,
-      status,
+      integral
     });
   };
 
@@ -147,10 +148,10 @@ export class MembersManage extends Component {
     }
 
     await this.props.dispatch({
-      type: 'activity/put',
+      type: 'members/put',
       payload: {
         id: record.id,
-        status: checked,
+        disabled: checked,
       },
     });
 
@@ -172,7 +173,7 @@ export class MembersManage extends Component {
       tableData,
     });
 
-    message.info(`${record.number}${record.nickname}已删除 ☠️`);
+    message.info(`${record.number}${record.nickname}已删除 ☠`);
   };
 
   handleModalVisible = (flag) => {
@@ -284,6 +285,16 @@ export class MembersManage extends Component {
         curPageSize,
         sort: '0',
       },
+    });
+  }
+
+  handleInputChange = (event) => {
+    const target = event.target;
+    const value = target.type === 'checkbox' ? target.checked : target.value;
+    const name = target.name;
+
+    this.setState({
+        [name]: value
     });
   }
 
@@ -408,16 +419,12 @@ export class MembersManage extends Component {
               </Button>
               <span className="ant-divider" />
 
-              {/* TODO: 修改成禁用方法 */}
-              <Popconfirm
-                title="确定要禁用吗？"
-                placement="topRight"
-                onConfirm={() => this.handleRowDeleteClick(id, index, record)}
-              >
-                <Button type="danger" icon="delete">
-                  禁用
-                </Button>
-              </Popconfirm>
+              <Switch 
+                checkedChildren='正常'
+                unCheckedChildren='禁用'
+                defaultChecked= { record.disabled === 0 }
+                onChange={checked => this.handleRowSwitchClick(checked, record)}
+              />
             </span>
           );
         },
@@ -503,7 +510,7 @@ export class MembersManage extends Component {
         <Modal
           title={editFormTitle}
           visible={modalVisible}
-          width={600}
+          width={800}
           onOk={this.handleSubmit}
           onCancel={() => this.handleModalVisible(false)}
         >
@@ -512,35 +519,35 @@ export class MembersManage extends Component {
               {getFieldDecorator('number', {
                 rules: customRules,
                 initialValue: this.state.number,
-              })(<Input />)}
+              })(<Input placeholder="请输入编号" />)}
             </FormItem>
 
             <FormItem {...formItemLayout} label="昵称">
               {getFieldDecorator('nickname', {
                 rules: customRules,
                 initialValue: this.state.nickname,
-              })(<Input />)}
+              })(<Input placeholder="请输入昵称" />)}
             </FormItem>
 
             <FormItem {...formItemLayout} label="真实姓名">
               {getFieldDecorator('name', {
                 rules: customRules,
                 initialValue: this.state.name,
-              })(<Input />)}
+              })(<Input placeholder="请输入真实姓名" />)}
             </FormItem>
             
             <FormItem {...formItemLayout} label="邮箱">
               {getFieldDecorator('email', {
                 rules: customRules,
                 initialValue: this.state.email,
-              })(<Input />)}
+              })(<Input placeholder="请输入邮箱" />)}
             </FormItem>
 
             <FormItem {...formItemLayout} label="手机">
               {getFieldDecorator('phone', {
                 rules: customRules,
                 initialValue: this.state.phone,
-              })(<Input />)}
+              })(<Input placeholder="请输入手机" />)}
             </FormItem>
 
             <FormItem {...formItemLayout} label="性别">
@@ -559,42 +566,42 @@ export class MembersManage extends Component {
               {getFieldDecorator('age', {
                 rules: customRules,
                 initialValue: this.state.age,
-              })(<Input />)}
+              })(<Input placeholder="请输入年龄" />)}
             </FormItem>
 
             <FormItem {...formItemLayout} label="地址">
               {getFieldDecorator('address', {
                 rules: customRules,
                 initialValue: this.state.address,
-              })(<Input />)}
+              })(<Input placeholder="请输入地址" />)}
             </FormItem>
 
             <FormItem {...formItemLayout} label="密码">
               {getFieldDecorator('password', {
                 rules: customRules,
                 initialValue: this.state.password,
-              })(<Input />)}
+              })(<Input placeholder="请输入密码" />)}
             </FormItem>
 
             <FormItem {...formItemLayout} label="积分">
               {getFieldDecorator('integral', {
                 rules: customRules,
                 initialValue: this.state.integral,
-              })(<Input />)}
+              })(<Input placeholder="请输入积分" />)}
             </FormItem>
 
             <FormItem {...formItemLayout} label="头像">
               {getFieldDecorator('portrait', {
                 rules: customRules,
                 initialValue: this.state.portrait,
-              })(<Input />)}
+              })(<Input placeholder="请输入头像" />)}
             </FormItem>
 
             <FormItem {...formItemLayout} label="个人宣言">
               {getFieldDecorator('personal_statement', {
                 rules: customRules,
                 initialValue: this.state.personal_statement,
-              })(<Input />)}
+              })(<Input placeholder="请输入个人宣言" />)}
             </FormItem>
           </Form>
         </Modal>

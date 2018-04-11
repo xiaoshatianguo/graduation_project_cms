@@ -101,7 +101,6 @@ export class ActivityInfo extends Component {
       status,
       auditor,
     } = record;
-
     this.tableCurIndex = index;
 
     sort += '';
@@ -340,6 +339,11 @@ export class ActivityInfo extends Component {
         title: '主题',
         className: 'ant-tableThead',
         dataIndex: 'topic',
+      },
+      {
+        title: '内容',
+        className: 'ant-tableThead',
+        dataIndex: 'content',
       },
       {
         title: '开始时间',
