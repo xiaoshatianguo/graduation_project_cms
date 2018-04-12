@@ -15,6 +15,7 @@ import {
   message,
   Tooltip,
   Icon,
+  Switch,
 } from 'antd';
 import moment from 'moment';
 import PageHeaderLayout from '../../layouts/PageHeaderLayout';
@@ -23,6 +24,7 @@ import { qiniuDomain } from '../../utils/appConfig';
 
 const FormItem = Form.Item;
 const { TextArea } = Input;
+const Option = Select.Option;
 
 @connect(({ production, loading }) => ({
   production,
