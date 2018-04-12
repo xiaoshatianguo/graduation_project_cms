@@ -181,7 +181,7 @@ export class CertifiedArchitectChecked extends Component {
       type: 'certifiedArchitect/put',
       payload: {
         id,
-        status: "0",
+        status: 0,
       },
     });
 
@@ -205,7 +205,7 @@ export class CertifiedArchitectChecked extends Component {
       type: 'certifiedArchitect/put',
       payload: {
         id,
-        status: "1",
+        status: 1,
       },
     });
 

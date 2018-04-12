@@ -15,6 +15,7 @@ import {
   message,
   Tooltip,
   Icon,
+  Switch,
 } from 'antd';
 import moment from 'moment';
 import PageHeaderLayout from '../../layouts/PageHeaderLayout';
@@ -23,6 +24,13 @@ import { qiniuDomain } from '../../utils/appConfig';
 
 const FormItem = Form.Item;
 const { TextArea } = Input;
+const Option = Select.Option;
+
+let categoriesList = {
+  '0': '人物摄影类',
+  '1': '动物摄影类',
+  '2': '植物摄影类',
+};
 
 @connect(({ production, loading }) => ({
   production,
@@ -40,8 +48,13 @@ export class ProductionChecked extends Component {
     name: '',
     author: '',
     sort: '',
+    cover: '',
     describe: '',
+    photography_props: '',
+    photography_site: '',
     content: '',
+    disabled: '',
+    status: '',
 
     editFormFlag: '', // 信息框的标记，add--添加，update--更新
     tableCurIndex: '', // 当前编辑的行数
@@ -57,6 +70,7 @@ export class ProductionChecked extends Component {
       payload: {
         currentPage,
         curPageSize,
+        status: 1,
       },
     });
   };
@@ -69,17 +83,22 @@ export class ProductionChecked extends Component {
   };
 
   handleRowEditClick = (index, record) => {
-    const {
+    let {
       id = -1,
       number,
       name,
       author,
       sort,
+      cover,
       describe,
+      photography_props,
+      photography_site,
       content,
     } = record;
 
     this.tableCurIndex = index;
+
+    sort += '';
 
     this.setState({
       id,
@@ -94,49 +113,107 @@ export class ProductionChecked extends Component {
       name,
       author,
       sort,
+      cover,
       describe,
+      photography_props,
+      photography_site,
       content,
     });
   };
+
+  handleAudit= async (index, record) => {
+    let { 
+      id = -1,
+      number,
+      name,
+      author,
+      sort,
+      cover,
+      describe,
+      photography_props,
+      photography_site,
+      content,
+    } = record;
+    this.tableCurIndex = index;
+
+    this.setState({
+      id,
+      modalVisible: true,
+      editFormTitle: '审核认证师信息',
+      editFormFlag: 'update',
+      tableCurIndex: index,
+    });
+
+    this.props.form.setFieldsValue({
+      number,
+      name,
+      author,
+      sort,
+      cover,
+      describe,
+      photography_props,
+      photography_site,
+      content,
+    });
+  }
+
+  handleAuditSucceed = async () => {
+    let { id=-1 } = this.state;
+
+    await this.props.dispatch({
+      type: 'production/put',
+      payload: {
+        id,
+        status: 0,
+      },
+    });
+
+    message.success("审核通过");
+
+    this.handleModalVisible(false);
+
+    let pagination={
+      current: this.state.currentPage,
+      pageSize: this.state.curPageSize,
+      total: this.state.tableDataTotal,
+    };
+
+    this.handleTableChange(pagination);
+  }
+
+  handleAuditFailure = async () => {
+    let { id=-1 } = this.state;
+
+    await this.props.dispatch({
+      type: 'production/put',
+      payload: {
+        id,
+        status: 1,
+      },
+    });
+
+    message.success("审核不通过");
+
+    this.handleModalVisible(false);
+    
+    let pagination={
+      current: this.state.currentPage,
+      pageSize: this.state.curPageSize,
+      total: this.state.tableDataTotal,
+    };
+
+    this.handleTableChange(pagination);
+  }
 
   handleModalVisible = (flag) => {
     this.setState({
       modalVisible: flag,
       editFormFlag: 'add',
-      editFormTitle: '新增活动',
+      editFormTitle: '新增作品',
       defaultFileListObj: {},
     });
     
     this.props.form.resetFields();
-  };
-
-  /**
-   * 表单提交事件，判断是创建项目还是更新项目，分别调用 create 方法和 update 方法
-   */
-  handleSubmit = (e) => {
-    e.preventDefault();
-    const { editFormFlag, id } = this.state;
-
-    this.props.form.validateFieldsAndScroll(async (err, values) => {
-      if (!err) {
-        if (editFormFlag === 'add') {
-          await this.props.dispatch({
-            type: 'production/add',
-            payload: values,
-          });
-          this.handleSucceedAdd();
-        } else if (editFormFlag === 'update') {
-          await this.props.dispatch({
-            type: 'production/put',
-            payload: {
-              id,
-              ...values,
-            },
-          });
-          this.handleSucceedUpdate();
-        }
-      }
-    });
   };
 
   /**
@@ -150,7 +227,7 @@ export class ProductionChecked extends Component {
     this.setState({ tableData });
     this.handleModalVisible(false);
 
-    message.info(`活动信息已更新`);
+    message.info(`作品信息已更新`);
   };
 
   /**
@@ -167,11 +244,41 @@ export class ProductionChecked extends Component {
       payload: {
         currentPage: current,
         curPageSize,
+        status: 1,
       },
     });
 
     this.setState({ currentPage: current });
   };
+
+  /**
+   * 处理查询按钮点击事件
+   */
+  handleSearchSubmit = () => {
+    let {
+    } = this.state;
+    
+    const { currentPage, curPageSize } = this.state;
+    
+    this.props.dispatch({
+      type: 'production/fetch',
+      payload: {
+        currentPage,
+        curPageSize,
+        status: 1,
+      },
+    });
+  }
+
+  handleInputChange = (event) => {
+    const target = event.target;
+    const value = target.type === 'checkbox' ? target.checked : target.value;
+    const name = target.name;
+
+    this.setState({
+        [name]: value
+    });
+  }
 
   render() {
     const columns = [
@@ -194,14 +301,32 @@ export class ProductionChecked extends Component {
         title: '分类',
         className: 'ant-tableThead',
         dataIndex: 'sort',
+        render: (text) => {
+          return <span>{ categoriesList[text] }</span>;
+        },
       },
       {
-        title: '描述',
+        title: '作品',
+        className: 'ant-tableThead',
+        dataIndex: 'cover',
+      },
+      {
+        title: '简介',
         className: 'ant-tableThead',
         dataIndex: 'describe',
       },
       {
-        title: '内容',
+        title: '摄影道具',
+        className: 'ant-tableThead',
+        dataIndex: 'photography_props',
+      },
+      {
+        title: '摄影地点',
+        className: 'ant-tableThead',
+        dataIndex: 'photography_site',
+      },
+      {
+        title: '描述详情',
         className: 'ant-tableThead',
         dataIndex: 'content',
       },
@@ -210,7 +335,7 @@ export class ProductionChecked extends Component {
         className: 'ant-tableThead',
         dataIndex: 'create_time',
         render: (text) => {
-          return <span>{moment(text).format('YYYY-MM-DD')}</span>;
+          return <span>{ !!text ? moment(text).format('YYYY-MM-DD HH:mm:ss') : '-' }</span>;
         },
       },
       {
@@ -223,8 +348,8 @@ export class ProductionChecked extends Component {
 
           return (
             <span>
-              <Button icon="edit" onClick={() => this.handleRowEditClick(index, record)}>
-                编辑
+              <Button icon="check-circle" onClick={() => this.handleAudit(index, record)}>
+                审核
               </Button>
             </span>
           );
@@ -256,13 +381,13 @@ export class ProductionChecked extends Component {
     const { modalVisible, editFormTitle, currentPage, curPageSize, tableDataTotal } = this.state;
     return (
       <PageHeaderLayout
-        title="活动审核"
-        content="审核认证师提交的活动申请。"
+        title="作品审核"
+        content="审核认证师提交的作品申请。"
       >
         <Card>
           <Row gutter={24}>
             <Col span={2}>
-              <h4>活动名称：</h4>
+              <h4>作品名称：</h4>
             </Col>
             <Col span={4}>
               <Input />
@@ -292,8 +417,15 @@ export class ProductionChecked extends Component {
           title={editFormTitle}
           visible={modalVisible}
           width={800}
-          onOk={this.handleSubmit}
+          onOk={this.handleAuditSucceed}
           onCancel={() => this.handleModalVisible(false)}
+          footer={[
+            <Button key="cancel" onClick={() => this.handleModalVisible(false)}>取消</Button>,
+            <Button key="failure" type="danger" onClick={this.handleAuditFailure}>审核不通过</Button>,
+            <Button key="submit" type="primary" loading={loading} onClick={this.handleAuditSucceed}>
+              审核通过
+            </Button>,
+          ]}
         >
           <Form onSubmit={this.handleSubmit} width={800}>
             <FormItem {...formItemLayout} label="编号">

@@ -26,6 +26,12 @@ const FormItem = Form.Item;
 const { TextArea } = Input;
 const Option = Select.Option;
 
+let categoriesList = {
+  '0': '人物摄影类',
+  '1': '动物摄影类',
+  '2': '植物摄影类',
+};
+
 @connect(({ production, loading }) => ({
   production,
   loading: loading.models.production,
@@ -42,8 +48,13 @@ export class ProductionInfo extends Component {
     name: '',
     author: '',
     sort: '',
+    cover: '',
     describe: '',
+    photography_props: '',
+    photography_site: '',
     content: '',
+    disabled: '',
+    status: '',
 
     editFormFlag: '', // 信息框的标记，add--添加，update--更新
     tableCurIndex: '', // 当前编辑的行数
@@ -59,6 +70,7 @@ export class ProductionInfo extends Component {
       payload: {
         currentPage,
         curPageSize,
+        status: 0,
       },
     });
   };
@@ -71,17 +83,22 @@ export class ProductionInfo extends Component {
   };
 
   handleRowEditClick = (index, record) => {
-    const {
+    let {
       id = -1,
       number,
       name,
       author,
       sort,
+      cover,
       describe,
+      photography_props,
+      photography_site,
       content,
     } = record;
 
     this.tableCurIndex = index;
+
+    sort += '';
 
     this.setState({
       id,
@@ -96,10 +113,42 @@ export class ProductionInfo extends Component {
       name,
       author,
       sort,
+      cover,
       describe,
+      photography_props,
+      photography_site,
       content,
     });
   };
+
+  handleRowSwitchClick = async (checked, record) => {
+    let message = '';
+
+    switch (checked) {
+      case false:
+      checked = 1*1;
+      message = "作品已屏蔽";
+        break;
+    
+      case true:
+      checked = 0*1;
+      message = "作品正常";
+        break;
+    
+      default:
+        break;
+    }
+
+    await this.props.dispatch({
+      type: 'production/put',
+      payload: {
+        id: record.id,
+        disabled: checked,
+      },
+    });
+
+    message.success(message);
+  }
 
   handleRowDeleteClick = async (id, index, record) => {
     await this.props.dispatch({
@@ -116,7 +165,7 @@ export class ProductionInfo extends Component {
       tableData,
     });
 
-    message.info(`《${record.name}》已删除 ☠️`);
+    message.info(`《${record.name}》已删除 ☠`);
   };
 
   handleModalVisible = (flag) => {
@@ -205,11 +254,41 @@ export class ProductionInfo extends Component {
       payload: {
         currentPage: current,
         curPageSize,
+        status: 0,
       },
     });
 
     this.setState({ currentPage: current });
   };
+
+  /**
+   * 处理查询按钮点击事件
+   */
+  handleSearchSubmit = () => {
+    let {
+    } = this.state;
+    
+    const { currentPage, curPageSize } = this.state;
+    
+    this.props.dispatch({
+      type: 'production/fetch',
+      payload: {
+        currentPage,
+        curPageSize,
+        status: 0,
+      },
+    });
+  }
+
+  handleInputChange = (event) => {
+    const target = event.target;
+    const value = target.type === 'checkbox' ? target.checked : target.value;
+    const name = target.name;
+
+    this.setState({
+        [name]: value
+    });
+  }
 
   render() {
     const columns = [
@@ -232,14 +311,32 @@ export class ProductionInfo extends Component {
         title: '分类',
         className: 'ant-tableThead',
         dataIndex: 'sort',
+        render: (text) => {
+          return <span>{ categoriesList[text] }</span>;
+        },
       },
       {
-        title: '描述',
+        title: '作品',
+        className: 'ant-tableThead',
+        dataIndex: 'cover',
+      },
+      {
+        title: '简介',
         className: 'ant-tableThead',
         dataIndex: 'describe',
       },
       {
-        title: '内容',
+        title: '摄影道具',
+        className: 'ant-tableThead',
+        dataIndex: 'photography_props',
+      },
+      {
+        title: '摄影地点',
+        className: 'ant-tableThead',
+        dataIndex: 'photography_site',
+      },
+      {
+        title: '描述详情',
         className: 'ant-tableThead',
         dataIndex: 'content',
       },
@@ -248,7 +345,7 @@ export class ProductionInfo extends Component {
         className: 'ant-tableThead',
         dataIndex: 'create_time',
         render: (text) => {
-          return <span>{moment(text).format('YYYY-MM-DD')}</span>;
+          return <span>{ !!text ? moment(text).format('YYYY-MM-DD HH:mm:ss') : '-' }</span>;
         },
       },
       {
@@ -275,6 +372,14 @@ export class ProductionInfo extends Component {
                   删除
                 </Button>
               </Popconfirm>
+              <span className="ant-divider" />
+
+              <Switch 
+                checkedChildren='正常'
+                unCheckedChildren='屏蔽'
+                defaultChecked= { record.disabled === 0 }
+                onChange={checked => this.handleRowSwitchClick(checked, record)}
+              />
             </span>
           );
         },
@@ -306,7 +411,7 @@ export class ProductionInfo extends Component {
     return (
       <PageHeaderLayout
         title="作品管理"
-        content="管理已经用户和认证师的作品。"
+        content="管理用户和认证师的作品。"
       >
         <Card>
           <Row gutter={24}>
@@ -371,10 +476,44 @@ export class ProductionInfo extends Component {
               })(<Input />)}
             </FormItem>
 
-            <FormItem {...formItemLayout} label="描述">
+            <FormItem {...formItemLayout} label="作品分类">
+              {getFieldDecorator('sort', {
+                rules: customRules,
+                initialValue: this.state.sort,
+              })(
+                <Select>
+                  <Option value="0">人物摄影类</Option>
+                  <Option value="1">动物摄影类</Option>
+                  <Option value="2">植物摄影类</Option>
+                </Select>
+              )}
+            </FormItem>
+
+            <FormItem {...formItemLayout} label="作品上传">
+              {getFieldDecorator('cover', {
+                rules: customRules,
+                initialValue: this.state.cover,
+              })(<Input />)}
+            </FormItem>
+
+            <FormItem {...formItemLayout} label="简介">
               {getFieldDecorator('describe', {
                 rules: customRules,
                 initialValue: this.state.describe,
+              })(<Input />)}
+            </FormItem>
+
+            <FormItem {...formItemLayout} label="摄影道具">
+              {getFieldDecorator('photography_props', {
+                rules: customRules,
+                initialValue: this.state.photography_props,
+              })(<Input />)}
+            </FormItem>
+
+            <FormItem {...formItemLayout} label="摄影地点">
+              {getFieldDecorator('photography_site', {
+                rules: customRules,
+                initialValue: this.state.photography_site,
               })(<Input />)}
             </FormItem>
 
@@ -382,13 +521,6 @@ export class ProductionInfo extends Component {
               {getFieldDecorator('content', {
                 rules: customRules,
                 initialValue: this.state.content,
-              })(<Input />)}
-            </FormItem>
-
-            <FormItem {...formItemLayout} label="分类">
-              {getFieldDecorator('sort', {
-                rules: customRules,
-                initialValue: this.state.sort,
               })(<Input />)}
             </FormItem>
           </Form>
