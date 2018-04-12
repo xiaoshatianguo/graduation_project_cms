@@ -70,6 +70,11 @@ const menuData = [
     ],
   },
   {
+    name: '作品分类管理',
+    icon: 'tags',
+    path: 'production-sort',
+  },
+  {
     name: '评论留言管理',
     icon: 'form',
     path: 'comments',

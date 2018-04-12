@@ -90,7 +90,7 @@ export const getRouterData = (app) => {
       component: dynamicWrapper(app, ['admin'], () => import('../routes/Admin/AdminManage')),
     },
     '/activity/info': {
-      component: dynamicWrapper(app, ['activity'], () => import('../routes/Activity/ActivityInfo'),
+      component: dynamicWrapper(app, ['activity','productionSort'], () => import('../routes/Activity/ActivityInfo'),
       ),
     },
     '/activity/checked': {
@@ -111,6 +111,9 @@ export const getRouterData = (app) => {
     },
     '/production/checked': {
       component: dynamicWrapper(app, ['production'], () => import('../routes/Production/ProductionChecked')),
+    },
+    '/production-sort': {
+      component: dynamicWrapper(app, ['productionSort'], () => import('../routes/ProductionSort/ProductionSort')),
     },
     '/comments/comments': {
       component: dynamicWrapper(app, ['comments'], () => import('../routes/Comments/Comments')),

@@ -9,7 +9,6 @@ import {
   Table,
   Popconfirm,
   InputNumber,
-  DatePicker,
   Modal,
   Form,
   Select,
@@ -26,16 +25,14 @@ import { qiniuDomain } from '../../utils/appConfig';
 const FormItem = Form.Item;
 const { TextArea } = Input;
 const Option = Select.Option;
-const { RangePicker } = DatePicker;
 
-@connect(({ activity, loading, productionSort }) => ({
-  activity,
+@connect(({ productionSort, loading }) => ({
   productionSort,
-  loading: loading.models.activity,
+  loading: loading.models.productionSort,
 }))
 
 @Form.create()
-export class ActivityInfo extends Component {
+export class ProductionSort extends Component {
   state = {
     tableData: [],
     modalVisible: false,
@@ -43,21 +40,7 @@ export class ActivityInfo extends Component {
 
     number: '',
     name: '',
-    initiator: '',
-    sort: '',
-    topic: '',
-    content: '',
-    start_time: '',
-    end_time: '',
-    status: '',
-    auditor: '',
-    disabled: '',
-
-    categoriesList: {},
-    categoriesArr: [],
-
-    searchName: '',
-    searchSort: '',
+    is_show: '',
 
     editFormFlag: '', // 信息框的标记，add--添加，update--更新
     tableCurIndex: '', // 当前编辑的行数
@@ -69,15 +52,6 @@ export class ActivityInfo extends Component {
     const { currentPage, curPageSize } = this.state;
 
     this.props.dispatch({
-      type: 'activity/fetch',
-      payload: {
-        currentPage,
-        curPageSize,
-        status: '0',
-      },
-    });
-
-    this.props.dispatch({
       type: 'productionSort/fetch',
       payload: {
         currentPage,
@@ -87,44 +61,21 @@ export class ActivityInfo extends Component {
   };
 
   componentWillReceiveProps = (nextProps) => {
-    const { data } = nextProps.activity;
+    const { data } = nextProps.productionSort;
     const { content = [], totalElements } = data;
 
-    // 获取分类对象进行处理、以及处理分类成数组
-    const categoriesData = nextProps.productionSort.data.content;
-    let categoriesObject = {};
-    let categoriesArr =[];
-    if(!!categoriesData) {
-      for (var i = 0; i < categoriesData.length; i++) {
-        categoriesObject[categoriesData[i].number] = categoriesData[i].name;
-        categoriesArr.push({
-          key: categoriesData[i].number,
-          value: categoriesData[i].name,
-        })
-      }
-    }
-
-    this.setState({ tableData: content, tableDataTotal: totalElements, categoriesList: categoriesObject, categoriesArr });
+    this.setState({ tableData: content, tableDataTotal: totalElements });
   };
 
   handleRowEditClick = (index, record) => {
-    let {
+    const {
       id = -1,
       number,
       name,
-      initiator,
-      sort,
-      topic,
-      content,
-      start_time,
-      end_time,
-      status,
-      auditor,
     } = record;
+
     this.tableCurIndex = index;
 
-    sort += '';
-    
     this.setState({
       id,
       modalVisible: true,
@@ -136,12 +87,6 @@ export class ActivityInfo extends Component {
     this.props.form.setFieldsValue({
       number,
       name,
-      initiator,
-      sort,
-      topic,
-      content,
-      start_time,
-      end_time,
     });
   };
 
@@ -151,12 +96,12 @@ export class ActivityInfo extends Component {
     switch (checked) {
       case false:
       checked = 1*1;
-      message = "活动已禁用";
+      message = "隐藏作品类型";
         break;
     
       case true:
       checked = 0*1;
-      message = "允许活动";
+      message = "显示作品类型";
         break;
     
       default:
@@ -164,10 +109,10 @@ export class ActivityInfo extends Component {
     }
 
     await this.props.dispatch({
-      type: 'activity/put',
+      type: 'productionSort/put',
       payload: {
         id: record.id,
-        disabled: checked,
+        is_show: checked,
       },
     });
 
@@ -176,7 +121,7 @@ export class ActivityInfo extends Component {
 
   handleRowDeleteClick = async (id, index, record) => {
     await this.props.dispatch({
-      type: 'activity/delete',
+      type: 'productionSort/delete',
       payload: {
         id,
       },
@@ -189,14 +134,14 @@ export class ActivityInfo extends Component {
       tableData,
     });
 
-    message.info(`${record.name} 已删除`);
+    message.info(`《${record.name}》已删除`);
   };
 
   handleModalVisible = (flag) => {
     this.setState({
       modalVisible: flag,
       editFormFlag: 'add',
-      editFormTitle: '新增活动',
+      editFormTitle: '新增作品类型',
       defaultFileListObj: {},
     });
     
@@ -211,23 +156,16 @@ export class ActivityInfo extends Component {
     const { editFormFlag, id } = this.state;
 
     this.props.form.validateFieldsAndScroll(async (err, values) => {
-      const rangeTimeValue = values['range-time-picker'];
-
-      values.start_time = rangeTimeValue[0].format('x');
-      values.end_time = rangeTimeValue[1].format('x');
-
-      delete values['range-time-picker'];
-
       if (!err) {
         if (editFormFlag === 'add') {
           await this.props.dispatch({
-            type: 'activity/add',
+            type: 'productionSort/add',
             payload: values,
           });
           this.handleSucceedAdd();
         } else if (editFormFlag === 'update') {
           await this.props.dispatch({
-            type: 'activity/put',
+            type: 'productionSort/put',
             payload: {
               id,
               ...values,
@@ -245,7 +183,7 @@ export class ActivityInfo extends Component {
   handleSucceedAdd = () => {
     const { tableData } = this.state;
 
-    tableData.unshift(this.props.activity.append);
+    tableData.unshift(this.props.productionSort.append);
 
     this.setState({
       tableDataTotal: this.state.tableDataTotal + 1,
@@ -255,21 +193,20 @@ export class ActivityInfo extends Component {
 
     this.handleModalVisible(false);
 
-    message.info(`新增活动成功`);
+    message.info(`新增作品类型成功`);
   };
-
   /**
    * 项目增加更新之后的处理方法，直接修改项目列表对应数据
    */
   handleSucceedUpdate = () => {
     const { tableData, tableCurIndex } = this.state;
 
-    tableData[tableCurIndex] = this.props.activity.updete;
+    tableData[tableCurIndex] = this.props.productionSort.updete;
 
     this.setState({ tableData });
     this.handleModalVisible(false);
 
-    message.info(`活动信息已更新`);
+    message.info(`作品类型信息已更新`);
   };
 
   /**
@@ -282,11 +219,10 @@ export class ActivityInfo extends Component {
     const { curPageSize } = this.state;
 
     this.props.dispatch({
-      type: 'activity/fetch',
+      type: 'productionSort/fetch',
       payload: {
         currentPage: current,
         curPageSize,
-        status: '0',
       },
     });
 
@@ -298,20 +234,15 @@ export class ActivityInfo extends Component {
    */
   handleSearchSubmit = () => {
     let {
-      searchName = '',
-      searchSort = '',
     } = this.state;
     
     const { currentPage, curPageSize } = this.state;
     
     this.props.dispatch({
-      type: 'activity/fetch',
+      type: 'productionSort/fetch',
       payload: {
         currentPage,
         curPageSize,
-        name: searchName,
-        sort: searchSort,
-        status: '0',
       },
     });
   }
@@ -326,19 +257,7 @@ export class ActivityInfo extends Component {
     });
   }
 
-  disabledDate = (current) => {
-    return current && current < moment().endOf('day');
-  }
-
   render() {
-    let categoriesOption =[];
-    
-    if(!!this.state.categoriesArr) {
-      this.state.categoriesArr.map((item, index)=>{
-        categoriesOption.push(<Option key={item.key} value={item.key}>{item.value}</Option>)
-      })
-    }
-
     const columns = [
       {
         title: '编号',
@@ -346,55 +265,24 @@ export class ActivityInfo extends Component {
         dataIndex: 'number',
       },
       {
-        title: '活动名称',
+        title: '作品分类名称',
         className: 'ant-tableThead',
         dataIndex: 'name',
-      },
-      {
-        title: '发起者',
-        className: 'ant-tableThead',
-        dataIndex: 'initiator',
-      },
-      {
-        title: '类别',
-        className: 'ant-tableThead',
-        dataIndex: 'sort',
-        render: (text) => {
-          return <span>{ this.state.categoriesList[text] }</span>;
-        },
-      },
-      {
-        title: '主题',
-        className: 'ant-tableThead',
-        dataIndex: 'topic',
-      },
-      {
-        title: '内容',
-        className: 'ant-tableThead',
-        dataIndex: 'content',
-      },
-      {
-        title: '开始时间',
-        className: 'ant-tableThead',
-        dataIndex: 'start_time',
-        render: (text) => {
-          return <span>{moment(text).format('YYYY-MM-DD HH:mm:ss')}</span>;
-        },
-      },
-      {
-        title: '结束时间',
-        className: 'ant-tableThead',
-        dataIndex: 'end_time',
-        render: (text) => {
-          return <span>{moment(text).format('YYYY-MM-DD HH:mm:ss')}</span>;
-        },
       },
       {
         title: '创建时间',
         className: 'ant-tableThead',
         dataIndex: 'create_time',
         render: (text) => {
-          return <span>{moment(text).format('YYYY-MM-DD HH:mm:ss')}</span>;
+          return <span>{ !!text ? moment(text).format('YYYY-MM-DD HH:mm:ss') : '-' }</span>;
+        },
+      },
+      {
+        title: '修改时间',
+        className: 'ant-tableThead',
+        dataIndex: 'update_time',
+        render: (text) => {
+          return <span>{ !!text ? moment(text).format('YYYY-MM-DD HH:mm:ss') : '-' }</span>;
         },
       },
       {
@@ -424,9 +312,9 @@ export class ActivityInfo extends Component {
               <span className="ant-divider" />
 
               <Switch 
-                checkedChildren='允许'
-                unCheckedChildren='禁用'
-                defaultChecked= { record.disabled === 0 }
+                checkedChildren='显示'
+                unCheckedChildren='隐藏'
+                defaultChecked= { record.is_show === 0 }
                 onChange={checked => this.handleRowSwitchClick(checked, record)}
               />
             </span>
@@ -434,7 +322,6 @@ export class ActivityInfo extends Component {
         },
       },
     ];
-
     const { getFieldDecorator } = this.props.form;
 
     const formItemLayout = {
@@ -458,44 +345,25 @@ export class ActivityInfo extends Component {
 
     const { loading } = this.props;
     const { modalVisible, editFormTitle, currentPage, curPageSize, tableDataTotal } = this.state;
-
     return (
       <PageHeaderLayout
-        title="活动管理"
-        content="管理已经通过审核的活动信息。"
+        title="作品分类管理"
+        content="管理作品的所有类别。"
       >
         <Card>
           <Row gutter={24}>
-            <Col span={3}>
-              <h4>活动发起人：</h4>
-            </Col>
-            <Col span={4}>
-              <Input 
-                name="searchName"
-                onChange={this.handleInputChange}
-              />
-            </Col>
-            <Col span={3}>
-              <h4>活动类别：</h4>
-            </Col>
-            <Col span={4}>
-              <Select
-                  allowClear={true}
-                  placeholder="选择活动类别"
-                  style={{ width: 150}}
-                  onChange={(value) => {
-                      this.setState({searchSort: value});
-                  }}
-              >
-                { categoriesOption }
-              </Select>
-            </Col>
             <Col span={2}>
-              <Button icon="search" htmlType="submit" onClick={this.handleSearchSubmit}>查询</Button>
+              <h4>作品名称：</h4>
+            </Col>
+            <Col span={4}>
+              <Input />
+            </Col>
+            <Col span={8}>
+              <Button icon="search">查询</Button>
             </Col>
             <Col span={4} offset={4}>
               <Button type="primary" icon="plus" onClick={() => this.handleModalVisible(true)}>
-                新增官方活动
+                新增作品类型
               </Button>
             </Col>
           </Row>
@@ -524,69 +392,18 @@ export class ActivityInfo extends Component {
           onCancel={() => this.handleModalVisible(false)}
         >
           <Form onSubmit={this.handleSubmit} width={800}>
-            <FormItem {...formItemLayout} label="活动编号">
+            <FormItem {...formItemLayout} label="编号">
               {getFieldDecorator('number', {
                 rules: customRules,
                 initialValue: this.state.number,
-              })(<Input placeholder="请输入活动编号" />)}
+              })(<Input />)}
             </FormItem>
 
-            <FormItem {...formItemLayout} label="活动名称">
+            <FormItem {...formItemLayout} label="作品分类名称">
               {getFieldDecorator('name', {
                 rules: customRules,
                 initialValue: this.state.name,
-              })(<Input placeholder="请输入活动名称" />)}
-            </FormItem>
-
-            <FormItem {...formItemLayout} label="发起者">
-              {getFieldDecorator('initiator', {
-                rules: customRules,
-                initialValue: this.state.initiator,
-              })(<Input placeholder="请输入活动发起者" />)}
-            </FormItem>
-
-            <FormItem {...formItemLayout} label="类别">
-              {getFieldDecorator('sort', {
-                rules: customRules,
-                initialValue: this.state.sort,
-              })(
-                <Select>
-                  { categoriesOption }
-                </Select>
-              )}
-            </FormItem>
-
-            <FormItem {...formItemLayout} label="主题">
-              {getFieldDecorator('topic', {
-                rules: customRules,
-                initialValue: this.state.topic,
-              })(<Input placeholder="请输入活动主题" />)}
-            </FormItem>
-
-            <FormItem {...formItemLayout} label="活动时间">
-              {getFieldDecorator('range-time-picker', {
-                rules: customRules,
-              })(
-                <RangePicker 
-                  disabledDate={this.disabledDate}
-                  showTime={{
-                    hideDisabledOptions: true,
-                    defaultValue: [moment('00:00:00', 'HH:mm:ss'), moment('23:59:59', 'HH:mm:ss')],
-                  }}
-                />
-              )}
-            </FormItem>
-
-            <FormItem {...formItemLayout} label="活动详情正文">
-              {getFieldDecorator('content', {
-                rules: customRules,
-                initialValue: this.state.content,
-              })(
-                <TextArea
-                  placeholder="请录入 MarkDown 格式的活动详情正文"
-                  autosize={{ minRows: 6, maxRows: 20 }}
-                />
-              )}
+              })(<Input />)}
             </FormItem>
           </Form>
         </Modal>
@@ -595,4 +412,4 @@ export class ActivityInfo extends Component {
   }
 }
 
-export default ActivityInfo;
+export default ProductionSort;
