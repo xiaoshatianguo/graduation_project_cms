@@ -87,14 +87,14 @@ export const getRouterData = (app) => {
       component: dynamicWrapper(app, ['login'], () => import('../routes/User/Login')),
     },
     '/admin': {
-      component: dynamicWrapper(app, ['admin'], () => import('../routes/Admin/AdminManage')),
+      component: dynamicWrapper(app, ['admin','productionSort'], () => import('../routes/Admin/AdminManage')),
     },
     '/activity/info': {
       component: dynamicWrapper(app, ['activity','productionSort'], () => import('../routes/Activity/ActivityInfo'),
       ),
     },
     '/activity/checked': {
-      component: dynamicWrapper(app, ['activity'], () => import('../routes/Activity/ActivityChecked'),
+      component: dynamicWrapper(app, ['activity','productionSort'], () => import('../routes/Activity/ActivityChecked'),
       ),
     },
     '/members': {
@@ -107,10 +107,10 @@ export const getRouterData = (app) => {
       component: dynamicWrapper(app, ['certifiedArchitect'], () => import('../routes/CertifiedArchitect/CertifiedArchitectChecked')),
     },
     '/production/info': {
-      component: dynamicWrapper(app, ['production'], () => import('../routes/Production/ProductionInfo')),
+      component: dynamicWrapper(app, ['production','productionSort'], () => import('../routes/Production/ProductionInfo')),
     },
     '/production/checked': {
-      component: dynamicWrapper(app, ['production'], () => import('../routes/Production/ProductionChecked')),
+      component: dynamicWrapper(app, ['production','productionSort'], () => import('../routes/Production/ProductionChecked')),
     },
     '/production-sort': {
       component: dynamicWrapper(app, ['productionSort'], () => import('../routes/ProductionSort/ProductionSort')),

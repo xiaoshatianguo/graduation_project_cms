@@ -24,15 +24,11 @@ import { qiniuDomain } from '../../utils/appConfig';
 
 const FormItem = Form.Item;
 const { TextArea } = Input;
+const Option = Select.Option;
 
-let categoriesList = {
-  '0': '人物摄影类',
-  '1': '动物摄影类',
-  '2': '植物摄影类',
-};
-
-@connect(({ activity, loading }) => ({
+@connect(({ activity, loading, productionSort }) => ({
   activity,
+  productionSort,
   loading: loading.models.activity,
 }))
 
@@ -55,6 +51,9 @@ export class ActivityChecked extends Component {
     status: '',
     auditor: '',
 
+    categoriesList: {},
+    categoriesArr: [],
+
     searchName: '',
 
     editFormFlag: '', // 信息框的标记，add--添加，update--更新
@@ -74,13 +73,35 @@ export class ActivityChecked extends Component {
         status: '1',
       },
     });
+
+    this.props.dispatch({
+      type: 'productionSort/fetch',
+      payload: {
+        currentPage,
+        curPageSize,
+      },
+    });
   };
 
   componentWillReceiveProps = (nextProps) => {
     const { data } = nextProps.activity;
     const { content = [], totalElements } = data;
 
-    this.setState({ tableData: content, tableDataTotal: totalElements });
+    // 获取分类对象进行处理、以及处理分类成数组
+    const categoriesData = nextProps.productionSort.data.content;
+    let categoriesObject = {};
+    let categoriesArr =[];
+    if(!!categoriesData) {
+      for (var i = 0; i < categoriesData.length; i++) {
+        categoriesObject[categoriesData[i].number] = categoriesData[i].name;
+        categoriesArr.push({
+          key: categoriesData[i].number,
+          value: categoriesData[i].name,
+        })
+      }
+    }
+
+    this.setState({ tableData: content, tableDataTotal: totalElements, categoriesList: categoriesObject, categoriesArr });
   };
 
   handleRowEditClick = (index, record) => {
@@ -283,6 +304,14 @@ export class ActivityChecked extends Component {
   }
 
   render() {
+    let categoriesOption =[];
+    
+    if(!!this.state.categoriesArr) {
+      this.state.categoriesArr.map((item, index)=>{
+        categoriesOption.push(<Option key={item.key} value={item.key}>{item.value}</Option>)
+      })
+    }
+
     const columns = [
       {
         title: '编号',
@@ -304,7 +333,7 @@ export class ActivityChecked extends Component {
         className: 'ant-tableThead',
         dataIndex: 'sort',
         render: (text) => {
-          return <span>{ categoriesList[text] }</span>;
+          return <span>{ this.state.categoriesList[text] }</span>;
         },
       },
       {
@@ -457,7 +486,11 @@ export class ActivityChecked extends Component {
               {getFieldDecorator('sort', {
                 rules: customRules,
                 initialValue: this.state.sort,
-              })(<Input placeholder="请输入活动类别" />)}
+              })(
+                <Select>
+                  { categoriesOption }
+                </Select>
+              )}
             </FormItem>
 
             <FormItem {...formItemLayout} label="主题">

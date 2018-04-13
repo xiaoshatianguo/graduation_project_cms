@@ -34,15 +34,10 @@ let integralList = {
   '1': '普通管理员',
 };
 
-let categoriesList = {
-  '0': '人物摄影类',
-  '1': '动物摄影类',
-  '2': '植物摄影类',
-};
-
 // 连接model层的state数据，然后通过this.props.state名(namespace)访问model层的state数据
-@connect(({ admin, loading }) => ({
+@connect(({ admin, loading, productionSort }) => ({
   admin,
+  productionSort,
   loading: loading.models.admin,
 }))
 
@@ -64,6 +59,9 @@ export class AdminManage extends Component {
     manage_categories: '',
     status: '',
 
+    categoriesList: {},
+    categoriesArr: [],
+
     searchCategories: '',
     searchIntegral: '',
 
@@ -83,14 +81,39 @@ export class AdminManage extends Component {
         curPageSize,
       },
     });
+
+    this.props.dispatch({
+      type: 'productionSort/fetch',
+      payload: {
+        currentPage,
+        curPageSize,
+      },
+    });
   };
 
   componentWillReceiveProps = (nextProps) => {
     const { data } = nextProps.admin;
     const { content = [], totalElements } = data;
+
+    // 获取分类对象进行处理、以及处理分类成数组
+    const categoriesData = nextProps.productionSort.data.content;
+    let categoriesObject = {};
+    let categoriesArr =[];
+    if(!!categoriesData) {
+      for (var i = 0; i < categoriesData.length; i++) {
+        categoriesObject[categoriesData[i].number] = categoriesData[i].name;
+        categoriesArr.push({
+          key: categoriesData[i].number,
+          value: categoriesData[i].name,
+        })
+      }
+    }
+
     this.setState({
       tableData: content,
       tableDataTotal: totalElements,
+      categoriesList: categoriesObject,
+      categoriesArr,
     });
   };
 
@@ -285,6 +308,14 @@ export class AdminManage extends Component {
   }
 
   render() {
+    let categoriesOption =[];
+    
+    if(!!this.state.categoriesArr) {
+      this.state.categoriesArr.map((item, index)=>{
+        categoriesOption.push(<Option key={item.key} value={item.key}>{item.value}</Option>)
+      })
+    }
+
     const columns = [
       {
         title: '编号',
@@ -322,7 +353,7 @@ export class AdminManage extends Component {
         className: 'ant-tableThead',
         dataIndex: 'manage_categories',
         render: (text) => {
-          return <span>{ categoriesList[text] }</span>;
+          return <span>{ this.state.categoriesList[text] }</span>;
         },
       },
       {
@@ -445,9 +476,7 @@ export class AdminManage extends Component {
                       this.setState({searchCategories: value});
                   }}
               >
-                <Option value="0">人物摄影类</Option>
-                <Option value="1">动物摄影类</Option>
-                <Option value="2">植物摄影类</Option>
+                { categoriesOption }
               </Select>
             </Col>
             <Col span={2}>
@@ -535,9 +564,7 @@ export class AdminManage extends Component {
                 initialValue: this.state.manage_categories,
               })(
                 <Select>
-                  <Option value="0">人物摄影类</Option>
-                  <Option value="1">动物摄影类</Option>
-                  <Option value="2">植物摄影类</Option>
+                  { categoriesOption }
                 </Select>
               )}
             </FormItem>
