@@ -56,6 +56,7 @@ export class ActivityInfo extends Component {
     categoriesList: {},
     categoriesArr: [],
 
+    searchInitiator: '',
     searchName: '',
     searchSort: '',
 
@@ -298,6 +299,7 @@ export class ActivityInfo extends Component {
    */
   handleSearchSubmit = () => {
     let {
+      searchInitiator = '',
       searchName = '',
       searchSort = '',
     } = this.state;
@@ -309,6 +311,7 @@ export class ActivityInfo extends Component {
       payload: {
         currentPage,
         curPageSize,
+        initiator: searchInitiator,
         name: searchName,
         sort: searchSort,
         status: '0',
@@ -468,6 +471,15 @@ export class ActivityInfo extends Component {
           <Row gutter={24}>
             <Col span={3}>
               <h4>活动发起人：</h4>
+            </Col>
+            <Col span={4}>
+              <Input 
+                name="searchInitiator"
+                onChange={this.handleInputChange}
+              />
+            </Col>
+            <Col span={3}>
+              <h4>活动名称：</h4>
             </Col>
             <Col span={4}>
               <Input 

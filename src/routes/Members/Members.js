@@ -56,6 +56,9 @@ export class MembersManage extends Component {
     disabled: '',
     status: '',
 
+    searchNumber: '',
+    searchNickName: '',
+
     editFormFlag: '', // 信息框的标记，add--添加，update--更新
     tableCurIndex: '', // 当前编辑的行数
     currentPage: 1, // 当前页数
@@ -274,6 +277,8 @@ export class MembersManage extends Component {
    */
   handleSearchSubmit = () => {
     let {
+      searchNumber= '',
+      searchNickName= '',
     } = this.state;
     
     const { currentPage, curPageSize } = this.state;
@@ -283,6 +288,8 @@ export class MembersManage extends Component {
       payload: {
         currentPage,
         curPageSize,
+        number: searchNumber,
+        nickname: searchNickName,
         sort: '0',
       },
     });
@@ -471,16 +478,22 @@ export class MembersManage extends Component {
               <h4>用户编号：</h4>
             </Col>
             <Col span={4}>
-              <Input />
+              <Input 
+                name="searchNumber"
+                onChange={this.handleInputChange}
+              />
             </Col>
             <Col span={3}>
               <h4>用户昵称：</h4>
             </Col>
             <Col span={4}>
-              <Input />
+              <Input 
+                name="searchNickName"
+                onChange={this.handleInputChange}
+              />
             </Col>
             <Col span={2}>
-              <Button icon="search">查询</Button>
+              <Button icon="search" htmlType="submit" onClick={this.handleSearchSubmit}>查询</Button>
             </Col>
             <Col span={4} offset={2}>
               <Button type="primary" icon="plus" onClick={() => this.handleModalVisible(true)}>

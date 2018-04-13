@@ -62,6 +62,8 @@ export class AdminManage extends Component {
     categoriesList: {},
     categoriesArr: [],
 
+    searchNumber: '',
+    searchNickName: '',
     searchCategories: '',
     searchIntegral: '',
 
@@ -290,6 +292,8 @@ export class AdminManage extends Component {
    */
   handleSearchSubmit = () => {
     let {
+      searchNumber= '',
+      searchNickName= '',
       searchIntegral = '',
       searchCategories= '',
     } = this.state;
@@ -301,9 +305,21 @@ export class AdminManage extends Component {
       payload: {
         currentPage,
         curPageSize,
+        number: searchNumber,
+        nick_name: searchNickName,
         integral: searchIntegral,
         manage_categories: searchCategories,
       },
+    });
+  }
+
+  handleInputChange = (event) => {
+    const target = event.target;
+    const value = target.type === 'checkbox' ? target.checked : target.value;
+    const name = target.name;
+
+    this.setState({
+        [name]: value
     });
   }
 
@@ -448,6 +464,24 @@ export class AdminManage extends Component {
       >
         <Card>
           <Row gutter={24}>
+            <Col span={3}>
+              <h4>管理员编号：</h4>
+            </Col>
+            <Col span={4}>
+              <Input 
+                name="searchNumber"
+                onChange={this.handleInputChange}
+              />
+            </Col>
+            <Col span={3}>
+              <h4>管理员昵称：</h4>
+            </Col>
+            <Col span={4}>
+              <Input 
+                name="searchNickName"
+                onChange={this.handleInputChange}
+              />
+            </Col>
             <Col span={3}>
               <h4>管理员权限：</h4>
             </Col>

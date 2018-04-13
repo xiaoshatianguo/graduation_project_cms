@@ -60,6 +60,9 @@ export class CertifiedArchitectInfo extends Component {
     status: '',
     sort: '',
 
+    searchNumber: '',
+    searchNickName: '',
+
     editFormFlag: '', // 信息框的标记，add--添加，update--更新
     tableCurIndex: '', // 当前编辑的行数
     currentPage: 1, // 当前页数
@@ -277,6 +280,8 @@ export class CertifiedArchitectInfo extends Component {
    */
   handleSearchSubmit = () => {
     let {
+      searchNumber= '',
+      searchNickName= '',
     } = this.state;
     
     const { currentPage, curPageSize } = this.state;
@@ -286,6 +291,8 @@ export class CertifiedArchitectInfo extends Component {
       payload: {
         currentPage,
         curPageSize,
+        number: searchNumber,
+        nickname: searchNickName,
         status: 0,
         sort: 2
       },
@@ -464,14 +471,26 @@ export class CertifiedArchitectInfo extends Component {
       >
         <Card>
           <Row gutter={24}>
-            <Col span={2}>
-              <h4>活动名称：</h4>
+            <Col span={3}>
+              <h4>认证师编号：</h4>
             </Col>
             <Col span={4}>
-              <Input />
+              <Input 
+                name="searchNumber"
+                onChange={this.handleInputChange}
+              />
             </Col>
-            <Col span={8}>
-              <Button icon="search">查询</Button>
+            <Col span={3}>
+              <h4>认证师昵称：</h4>
+            </Col>
+            <Col span={4}>
+              <Input 
+                name="searchNickName"
+                onChange={this.handleInputChange}
+              />
+            </Col>
+            <Col span={2}>
+              <Button icon="search" htmlType="submit" onClick={this.handleSearchSubmit}>查询</Button>
             </Col>
             <Col span={4} offset={4}>
               <Button type="primary" icon="plus" onClick={() => this.handleModalVisible(true)}>

@@ -54,6 +54,11 @@ export class ProductionChecked extends Component {
     categoriesList: {},
     categoriesArr: [],
 
+    searchNumber: '',
+    searchName: '',
+    searchAuthor: '',
+    searchSort: '',
+
     editFormFlag: '', // 信息框的标记，add--添加，update--更新
     tableCurIndex: '', // 当前编辑的行数
     currentPage: 1, // 当前页数
@@ -276,6 +281,10 @@ export class ProductionChecked extends Component {
    */
   handleSearchSubmit = () => {
     let {
+      searchNumber= '',
+      searchName= '',
+      searchAuthor= '',
+      searchSort= '',
     } = this.state;
     
     const { currentPage, curPageSize } = this.state;
@@ -285,6 +294,10 @@ export class ProductionChecked extends Component {
       payload: {
         currentPage,
         curPageSize,
+        number: searchNumber,
+        name: searchName,
+        author: searchAuthor,
+        sort: searchSort,
         status: 1,
       },
     });
@@ -414,14 +427,50 @@ export class ProductionChecked extends Component {
       >
         <Card>
           <Row gutter={24}>
-            <Col span={2}>
+            <Col span={3}>
+              <h4>作品编号：</h4>
+            </Col>
+            <Col span={4}>
+              <Input 
+                name="searchNumber"
+                onChange={this.handleInputChange}
+              />
+            </Col>
+            <Col span={3}>
               <h4>作品名称：</h4>
             </Col>
             <Col span={4}>
-              <Input />
+              <Input 
+                name="searchName"
+                onChange={this.handleInputChange}
+              />
             </Col>
-            <Col span={8}>
-              <Button icon="search">查询</Button>
+            <Col span={3}>
+              <h4>作品作者：</h4>
+            </Col>
+            <Col span={4}>
+              <Input 
+                name="searchAuthor"
+                onChange={this.handleInputChange}
+              />
+            </Col>
+            <Col span={3}>
+              <h4>作品类别：</h4>
+            </Col>
+            <Col span={4}>
+              <Select
+                  allowClear={true}
+                  placeholder="选择管理员类别"
+                  style={{ width: 150}}
+                  onChange={(value) => {
+                      this.setState({searchCategories: value});
+                  }}
+              >
+                { categoriesOption }
+              </Select>
+            </Col>
+            <Col span={2}>
+              <Button icon="search" htmlType="submit" onClick={this.handleSearchSubmit}>查询</Button>
             </Col>
           </Row>
         </Card>

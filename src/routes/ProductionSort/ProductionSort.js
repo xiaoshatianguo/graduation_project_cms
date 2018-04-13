@@ -352,16 +352,7 @@ export class ProductionSort extends Component {
       >
         <Card>
           <Row gutter={24}>
-            <Col span={2}>
-              <h4>作品名称：</h4>
-            </Col>
             <Col span={4}>
-              <Input />
-            </Col>
-            <Col span={8}>
-              <Button icon="search">查询</Button>
-            </Col>
-            <Col span={4} offset={4}>
               <Button type="primary" icon="plus" onClick={() => this.handleModalVisible(true)}>
                 新增作品类型
               </Button>

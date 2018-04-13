@@ -54,7 +54,9 @@ export class ActivityChecked extends Component {
     categoriesList: {},
     categoriesArr: [],
 
+    searchInitiator: '',
     searchName: '',
+    searchSort: '',
 
     editFormFlag: '', // 信息框的标记，add--添加，update--更新
     tableCurIndex: '', // 当前编辑的行数
@@ -277,7 +279,9 @@ export class ActivityChecked extends Component {
    */
   handleSearchSubmit = () => {
     let {
-      searchName = '',
+      searchInitiator= '',
+      searchName= '',
+      searchSort= '',
     } = this.state;
     
     const { currentPage, curPageSize } = this.state;
@@ -287,7 +291,9 @@ export class ActivityChecked extends Component {
       payload: {
         currentPage,
         curPageSize,
+        initiator: searchInitiator,
         name: searchName,
+        sort: searchSort,
         status: '1',
       },
     });
@@ -416,7 +422,16 @@ export class ActivityChecked extends Component {
       >
         <Card>
           <Row gutter={24}>
-            <Col span={2}>
+            <Col span={3}>
+              <h4>活动发起人：</h4>
+            </Col>
+            <Col span={4}>
+              <Input 
+                name="searchInitiator"
+                onChange={this.handleInputChange}
+              />
+            </Col>
+            <Col span={3}>
               <h4>活动名称：</h4>
             </Col>
             <Col span={4}>
@@ -424,6 +439,21 @@ export class ActivityChecked extends Component {
                 name="searchName"
                 onChange={this.handleInputChange}
               />
+            </Col>
+            <Col span={3}>
+              <h4>活动类别：</h4>
+            </Col>
+            <Col span={4}>
+              <Select
+                  allowClear={true}
+                  placeholder="选择活动类别"
+                  style={{ width: 150}}
+                  onChange={(value) => {
+                      this.setState({searchSort: value});
+                  }}
+              >
+                { categoriesOption }
+              </Select>
             </Col>
             <Col span={2}>
               <Button icon="search" htmlType="submit" onClick={this.handleSearchSubmit}>查询</Button>
