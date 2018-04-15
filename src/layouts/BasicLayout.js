@@ -98,6 +98,25 @@ class BasicLayout extends React.PureComponent {
     }
     return title;
   }
+  getBashRedirect = () => {
+    // According to the url parameter to redirect
+    // 这里是重定向的,重定向到 url 的 redirect 参数所示地址
+    const urlParams = new URL(window.location.href);
+
+    const redirect = urlParams.searchParams.get('redirect');
+    // Remove the parameters in the url
+    if (redirect) {
+      urlParams.searchParams.delete('redirect');
+      window.history.replaceState(null, 'redirect', urlParams.href);
+    } else {
+      const { routerData } = this.props;
+      // get the first authorized route path in routerData
+      const authorizedPath = Object.keys(routerData).find(item =>
+        check(routerData[item].authority, item) && item !== '/');
+      return authorizedPath;
+    }
+    return redirect;
+  }
   handleMenuCollapse = (collapsed) => {
     this.props.dispatch({
       type: 'global/changeLayoutCollapsed',
@@ -112,6 +131,10 @@ class BasicLayout extends React.PureComponent {
     });
   };
   handleMenuClick = ({ key }) => {
+    if (key === 'triggerError') {
+      this.props.dispatch(routerRedux.push('/exception/trigger'));
+      return;
+    }
     if (key === 'logout') {
       this.props.dispatch({
         type: 'login/logout',
@@ -165,19 +188,23 @@ class BasicLayout extends React.PureComponent {
           <Content style={{ margin: '24px 24px 0', height: '100%' }}>
             <div style={{ minHeight: 'calc(100vh - 260px)' }}>
               <Switch>
-                {getRoutes(match.path, routerData).map(item => (
-                  <AuthorizedRoute
-                    key={item.key}
-                    path={item.path}
-                    component={item.component}
-                    exact={item.exact}
-                    authority={item.authority}
-                    redirectPath="/exception/403"
-                  />
-                ))}
-                {redirectData.map(item => (
-                  <Redirect key={item.from} exact from={item.from} to={item.to} />
-                ))}
+                {
+                  getRoutes(match.path, routerData).map(item => (
+                    <AuthorizedRoute
+                      key={item.key}
+                      path={item.path}
+                      component={item.component}
+                      exact={item.exact}
+                      authority={item.authority}
+                      redirectPath="/exception/403"
+                    />
+                  ))
+                }
+                {
+                  redirectData.map(item => (
+                    <Redirect key={item.from} exact from={item.from} to={item.to} />
+                  ))
+                }
                 <Redirect exact from="/" to="/admin" />
                 <Route render={NotFound} />
               </Switch>

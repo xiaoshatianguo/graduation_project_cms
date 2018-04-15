@@ -8,6 +8,7 @@ import logo from '../assets/logo.svg';
 import { getRoutes } from '../utils/utils';
 
 const links = [
+  // TODO: 此处登陆页跳转到当前登陆页，后期应当更改
   {
     key: 'help',
     title: '帮助',
@@ -52,12 +53,12 @@ class UserLayout extends React.PureComponent {
                 <img
                   alt="logo"
                   className={styles.logo}
-                  src="/public/favicon.png"
+                  src={logo}
                 />
                 <span className={styles.title}>摄影网站</span>
               </Link>
             </div>
-            <div className={styles.desc}>摄影网站</div>
+            <div className={styles.desc}>Photo Website 小莎的原创作品摄影网站 Created By Yeyi.</div>
           </div>
           <Switch>
             {getRoutes(match.path, routerData).map(item => (

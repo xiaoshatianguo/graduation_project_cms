@@ -1,5 +1,7 @@
+import { routerRedux } from 'dva/router';
 import { fakeAccountLogin } from '../services/api';
 import { setAuthority } from '../utils/authority';
+import { reloadAuthorized } from '../utils/Authorized';
 
 export default {
   namespace: 'login',
@@ -22,20 +24,34 @@ export default {
         // The refresh will automatically redirect to the home page
         // yield put(routerRedux.push('/'));
         window.location.reload();
+        // reloadAuthorized();
+        // yield put(routerRedux.push('/'));
       }
     },
-    *logout(_, { put }) {
-      yield put({
-        type: 'changeLoginStatus',
-        payload: {
-          status: false,
-          currentAuthority: 'guest',
-        },
-      });
+    *logout(_, { put, select }) {
+      try {
+        // get location pathname
+        const urlParams = new URL(window.location.href);
+        const pathname = yield select(state => state.routing.location.pathname);
+        // add the parameters in the url
+        urlParams.searchParams.set('redirect', pathname);
+        window.history.replaceState(null, 'login', urlParams.href);
+      } finally {
+        yield put({
+          type: 'changeLoginStatus',
+          payload: {
+            status: false,
+            currentAuthority: 'guest',
+          },
+        });
+        window.location.reload();
+        // reloadAuthorized();
+        // yield put(routerRedux.push('/user/login'));
+      }
       // yield put(routerRedux.push('/user/login'));
       // Login out after permission changes to admin or user
       // The refresh will automatically redirect to the login page
-      window.location.reload();
+      // window.location.reload();
     },
   },
 
