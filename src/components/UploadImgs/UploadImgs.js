@@ -83,8 +83,10 @@ class UploadImgs extends Component {
   }
 
   beforeUpload = (file, fileList) => {
+    // 修改上传文件的后缀名
+    var n=file.name.split(".");
     const token = utils.getSSItem('token', true) || '';
-    const key = utils.getUuidFileName();
+    const key = utils.getUuidFileName()+"."+n[n.length-1];
     const param = {
       url: `${appConfig.getQiniuToken}?key=${key}`,
       method: 'get',
@@ -92,6 +94,8 @@ class UploadImgs extends Component {
       //     Authorization: `token ${token}`
       // }
     };
+
+    console.log(param);
 
     return axios(param).then((response) => {
       const data = {

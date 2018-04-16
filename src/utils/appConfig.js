@@ -26,9 +26,9 @@ export const bunchStrsSeparator = '、';
 
 /* 七牛bucket空间名称 */
 // TODO: 更改七牛云地址
-export const qiniuBucket = 'blogs-pic';
-export const qiniuDomain = 'http://ok49dhwbm.bkt.clouddn.com';
+export const qiniuBucket = 'xiaosha';
+export const qiniuDomain = 'http://p1s12lchv.bkt.clouddn.com';
 export const qiniuUploadApi = '//upload-z2.qiniu.com/';
 
 /* 七牛获取 token 地址 */
-export const getQiniuToken = `${apiPrefix}/api/qiuniuyun_token`;
+export const getQiniuToken = `${apiPrefix}/api/qiuniuyun`;
