@@ -80,10 +80,6 @@ export class ActivityInfo extends Component {
 
     this.props.dispatch({
       type: 'productionSort/fetch',
-      payload: {
-        currentPage,
-        curPageSize,
-      },
     });
   };
 

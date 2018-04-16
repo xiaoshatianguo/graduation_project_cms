@@ -95,8 +95,6 @@ class UploadImgs extends Component {
       // }
     };
 
-    console.log(param);
-
     return axios(param).then((response) => {
       const data = {
         key,

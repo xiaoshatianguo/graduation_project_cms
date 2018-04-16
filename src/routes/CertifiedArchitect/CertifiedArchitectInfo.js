@@ -60,6 +60,8 @@ export class CertifiedArchitectInfo extends Component {
     status: '',
     sort: '',
 
+    defaultFileList: [],
+
     searchNumber: '',
     searchNickName: '',
 
@@ -110,10 +112,22 @@ export class CertifiedArchitectInfo extends Component {
 
     sex += '';
 
+    const defaultFileList = [];
+
+    if (portrait) {
+      defaultFileList.push({
+        uid: portrait,
+        picname: `p-${portrait}.png`,
+        status: 'done',
+        url: portrait,
+      });
+    }
+
     this.setState({
       id,
       modalVisible: true,
       editFormTitle: '编辑信息',
+      defaultFileList,
       editFormFlag: 'update',
       tableCurIndex: index,
     });
@@ -186,7 +200,7 @@ export class CertifiedArchitectInfo extends Component {
       modalVisible: flag,
       editFormFlag: 'add',
       editFormTitle: '新增认证师',
-      defaultFileListObj: {},
+      defaultFileList: [],
     });
     
     this.props.form.resetFields();
@@ -239,6 +253,7 @@ export class CertifiedArchitectInfo extends Component {
 
     message.info(`新增认证师成功`);
   };
+
   /**
    * 项目增加更新之后的处理方法，直接修改项目列表对应数据
    */
@@ -251,6 +266,22 @@ export class CertifiedArchitectInfo extends Component {
     this.handleModalVisible(false);
 
     message.info(`认证师信息已更新`);
+  }; 
+  
+  /**
+   * 处理图片上传组件成功上传之后返回的数据
+   *
+   * @param  {object} [fileList]       文件数据对象数组
+   * @param  {string} tag     图片上传组件对应的表单字段
+   */
+  handleUploadChange = (fileList, tag) => {
+    const valueObj = {};
+
+    if (fileList.length > 0) {
+      const imageURL = `${qiniuDomain}/${fileList[0].response.key}`;
+      valueObj[tag] = imageURL;
+      this.props.form.setFieldsValue(valueObj);
+    }
   };
 
   /**
@@ -576,7 +607,9 @@ export class CertifiedArchitectInfo extends Component {
               {getFieldDecorator('age', {
                 rules: customRules,
                 initialValue: this.state.age,
-              })(<Input placeholder="请输入年龄" />)}
+              })(
+                <InputNumber min={0} width={200} />
+              )}
             </FormItem>
 
             <FormItem {...formItemLayout} label="地址">
@@ -597,14 +630,22 @@ export class CertifiedArchitectInfo extends Component {
               {getFieldDecorator('integral', {
                 rules: customRules,
                 initialValue: this.state.integral,
-              })(<Input placeholder="请输入积分" />)}
+              })(
+                <InputNumber min={0} width={200} />
+              )}
             </FormItem>
 
             <FormItem {...formItemLayout} label="头像">
               {getFieldDecorator('portrait', {
                 rules: customRules,
-                initialValue: this.state.portrait,
-              })(<Input placeholder="请输入头像" />)}
+              })(
+                <UploadImgs
+                  isEnhanceSingle
+                  limit={1}
+                  defaultFileList={this.state.defaultFileList}
+                  handleUploadChange={fileList => this.handleUploadChange(fileList, 'portrait')}
+                />
+              )}
             </FormItem>
 
             <FormItem {...formItemLayout} label="个人宣言">

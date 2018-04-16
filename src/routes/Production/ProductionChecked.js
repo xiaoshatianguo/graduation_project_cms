@@ -79,10 +79,6 @@ export class ProductionChecked extends Component {
 
     this.props.dispatch({
       type: 'productionSort/fetch',
-      payload: {
-        currentPage,
-        curPageSize,
-      },
     });
   };
 
@@ -350,6 +346,10 @@ export class ProductionChecked extends Component {
         title: '作品',
         className: 'ant-tableThead',
         dataIndex: 'cover',
+        width: 80,
+        render: (text) => {
+          return <img src={text} style={{width:80}} />
+        }
       },
       {
         title: '简介',

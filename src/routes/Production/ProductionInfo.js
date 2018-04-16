@@ -51,6 +51,8 @@ export class ProductionInfo extends Component {
     disabled: '',
     status: '',
 
+    defaultFileList: [],
+
     categoriesList: {},
     categoriesArr: [],
 
@@ -79,10 +81,6 @@ export class ProductionInfo extends Component {
 
     this.props.dispatch({
       type: 'productionSort/fetch',
-      payload: {
-        currentPage,
-        curPageSize,
-      },
     });
   };
 
@@ -125,10 +123,22 @@ export class ProductionInfo extends Component {
 
     sort += '';
 
+    const defaultFileList = [];
+
+    if (cover) {
+      defaultFileList.push({
+        uid: cover,
+        picname: `p-${cover}.png`,
+        status: 'done',
+        url: cover,
+      });
+    }
+
     this.setState({
       id,
       modalVisible: true,
       editFormTitle: '编辑信息',
+      defaultFileList,
       editFormFlag: 'update',
       tableCurIndex: index,
     });
@@ -251,6 +261,7 @@ export class ProductionInfo extends Component {
 
     message.info(`新增作品成功`);
   };
+
   /**
    * 项目增加更新之后的处理方法，直接修改项目列表对应数据
    */
@@ -263,6 +274,22 @@ export class ProductionInfo extends Component {
     this.handleModalVisible(false);
 
     message.info(`作品信息已更新`);
+  };
+
+  /**
+   * 处理图片上传组件成功上传之后返回的数据
+   *
+   * @param  {object} [fileList]       文件数据对象数组
+   * @param  {string} tag     图片上传组件对应的表单字段
+   */
+  handleUploadChange = (fileList, tag) => {
+    const valueObj = {};
+
+    if (fileList.length > 0) {
+      const imageURL = `${qiniuDomain}/${fileList[0].response.key}`;
+      valueObj[tag] = imageURL;
+      this.props.form.setFieldsValue(valueObj);
+    }
   };
 
   /**
@@ -360,6 +387,10 @@ export class ProductionInfo extends Component {
         title: '作品',
         className: 'ant-tableThead',
         dataIndex: 'cover',
+        width: 80,
+        render: (text) => {
+          return <img src={text} style={{width:80}} />
+        }
       },
       {
         title: '简介',
@@ -567,8 +598,14 @@ export class ProductionInfo extends Component {
             <FormItem {...formItemLayout} label="作品上传">
               {getFieldDecorator('cover', {
                 rules: customRules,
-                initialValue: this.state.cover,
-              })(<Input />)}
+              })(
+                <UploadImgs
+                  isEnhanceSingle
+                  limit={1}
+                  defaultFileList={this.state.defaultFileList}
+                  handleUploadChange={fileList => this.handleUploadChange(fileList, 'cover')}
+                />
+              )}
             </FormItem>
 
             <FormItem {...formItemLayout} label="简介">
