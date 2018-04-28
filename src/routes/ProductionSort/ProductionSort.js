@@ -40,6 +40,7 @@ export class ProductionSort extends Component {
 
     number: '',
     name: '',
+    cover: '',
     is_show: '',
 
     editFormFlag: '', // 信息框的标记，add--添加，update--更新
@@ -72,6 +73,7 @@ export class ProductionSort extends Component {
       id = -1,
       number,
       name,
+      cover,
     } = record;
 
     this.tableCurIndex = index;
@@ -87,6 +89,7 @@ export class ProductionSort extends Component {
     this.props.form.setFieldsValue({
       number,
       name,
+      cover,
     });
   };
 
@@ -210,6 +213,22 @@ export class ProductionSort extends Component {
   };
 
   /**
+   * 处理图片上传组件成功上传之后返回的数据
+   *
+   * @param  {object} [fileList]       文件数据对象数组
+   * @param  {string} tag     图片上传组件对应的表单字段
+   */
+  handleUploadChange = (fileList, tag) => {
+    const valueObj = {};
+
+    if (fileList.length > 0) {
+      const imageURL = `${qiniuDomain}/${fileList[0].response.key}`;
+      valueObj[tag] = imageURL;
+      this.props.form.setFieldsValue(valueObj);
+    }
+  };
+
+  /**
    * 表格分页改变相应事件
    * @param {object} pagination   分页数据对象，标记着当前页、页大小、总数
    */
@@ -268,6 +287,14 @@ export class ProductionSort extends Component {
         title: '作品分类名称',
         className: 'ant-tableThead',
         dataIndex: 'name',
+      },
+      {
+        title: '作品分类封面',
+        className: 'ant-tableThead',
+        dataIndex: 'cover',
+        render: (text) => {
+          return <img src={text} style={{width:80}} />
+        }
       },
       {
         title: '创建时间',
@@ -395,6 +422,19 @@ export class ProductionSort extends Component {
                 rules: customRules,
                 initialValue: this.state.name,
               })(<Input />)}
+            </FormItem>
+
+            <FormItem {...formItemLayout} label="封面">
+              {getFieldDecorator('cover', {
+                rules: customRules,
+              })(
+                <UploadImgs
+                  isEnhanceSingle
+                  limit={1}
+                  defaultFileList={this.state.defaultFileList}
+                  handleUploadChange={fileList => this.handleUploadChange(fileList, 'cover')}
+                />
+              )}
             </FormItem>
           </Form>
         </Modal>

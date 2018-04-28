@@ -55,6 +55,7 @@ export class CertifiedArchitectInfo extends Component {
     address: '',
     portrait: '',
     personal_statement: '',
+    bgcover: '',
     integral: '',
     disabled: '',
     status: '',
@@ -106,6 +107,7 @@ export class CertifiedArchitectInfo extends Component {
       address,
       portrait,
       personal_statement,
+      bgcover,
       integral,
     } = record;
     this.tableCurIndex = index;
@@ -144,6 +146,7 @@ export class CertifiedArchitectInfo extends Component {
       address,
       portrait,
       personal_statement,
+      bgcover,
       integral
     });
   };
@@ -422,6 +425,15 @@ export class CertifiedArchitectInfo extends Component {
         width: 200,
       },
       {
+        title: '主页背景图',
+        className: 'ant-tableThead',
+        dataIndex: 'bgcover',
+        width: 200,
+        render: (text) => {
+          return <img src={text} style={{width:80}} />
+        }
+      },
+      {
         title: '积分',
         className: 'ant-tableThead',
         dataIndex: 'integral',
@@ -534,7 +546,7 @@ export class CertifiedArchitectInfo extends Component {
         <Row>
           <Table
             width={800}
-            scroll={{ x: 1990 }}
+            scroll={{ x: 2190 }}
             columns={columns}
             rowKey={record => record.id || 0}
             dataSource={this.state.tableData}
@@ -653,6 +665,19 @@ export class CertifiedArchitectInfo extends Component {
                 rules: customRules,
                 initialValue: this.state.personal_statement,
               })(<Input placeholder="请输入个人宣言" />)}
+            </FormItem>
+
+            <FormItem {...formItemLayout} label="主页背景图">
+              {getFieldDecorator('bgcover', {
+                rules: customRules,
+              })(
+                <UploadImgs
+                  isEnhanceSingle
+                  limit={1}
+                  defaultFileList={this.state.defaultFileList}
+                  handleUploadChange={fileList => this.handleUploadChange(fileList, 'bgcover')}
+                />
+              )}
             </FormItem>
           </Form>
         </Modal>

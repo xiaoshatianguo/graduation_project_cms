@@ -94,9 +94,9 @@ export class ProductionInfo extends Component {
     let categoriesArr =[];
     if(!!categoriesData) {
       for (var i = 0; i < categoriesData.length; i++) {
-        categoriesObject[categoriesData[i].number] = categoriesData[i].name;
+        categoriesObject[categoriesData[i].id] = categoriesData[i].name;
         categoriesArr.push({
-          key: categoriesData[i].number,
+          key: categoriesData[i].id,
           value: categoriesData[i].name,
         })
       }

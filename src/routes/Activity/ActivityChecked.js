@@ -9,6 +9,7 @@ import {
   Table,
   Popconfirm,
   InputNumber,
+  DatePicker,
   Modal,
   Form,
   Select,
@@ -25,6 +26,7 @@ import { qiniuDomain } from '../../utils/appConfig';
 const FormItem = Form.Item;
 const { TextArea } = Input;
 const Option = Select.Option;
+const { RangePicker } = DatePicker;
 
 @connect(({ activity, loading, productionSort }) => ({
   activity,
@@ -45,7 +47,11 @@ export class ActivityChecked extends Component {
     initiator: '',
     sort: '',
     topic: '',
+    describe: '',
     content: '',
+    rule: '',
+    cover: '',
+    banner: '',
     start_time: '',
     end_time: '',
     status: '',
@@ -110,7 +116,11 @@ export class ActivityChecked extends Component {
       initiator,
       sort,
       topic,
+      describe,
       content,
+      rule,
+      cover,
+      banner,
       start_time,
       end_time,
       status,
@@ -135,7 +145,11 @@ export class ActivityChecked extends Component {
       initiator,
       sort,
       topic,
+      describe,
       content,
+      rule,
+      cover,
+      banner,
       start_time,
       end_time,
     });
@@ -149,7 +163,11 @@ export class ActivityChecked extends Component {
       initiator,
       sort,
       topic,
+      describe,
       content,
+      rule,
+      cover,
+      banner,
       start_time,
       end_time,
       status,
@@ -171,7 +189,11 @@ export class ActivityChecked extends Component {
       initiator,
       sort,
       topic,
+      describe,
       content,
+      rule,
+      cover,
+      banner,
       start_time,
       end_time,
       status,
@@ -319,39 +341,78 @@ export class ActivityChecked extends Component {
         title: '编号',
         className: 'ant-tableThead',
         dataIndex: 'number',
-      },
-      {
-        title: '活动名称',
-        className: 'ant-tableThead',
-        dataIndex: 'name',
+        width: 80,
+        fixed: 'left',
       },
       {
         title: '发起者',
         className: 'ant-tableThead',
         dataIndex: 'initiator',
+        width: 100,
+        fixed: 'left',
       },
       {
-        title: '类别',
+        title: '活动标题',
+        className: 'ant-tableThead',
+        dataIndex: 'name',
+        width: 100,
+      },
+      {
+        title: '活动类别',
         className: 'ant-tableThead',
         dataIndex: 'sort',
+        width: 160,
         render: (text) => {
           return <span>{ this.state.categoriesList[text] }</span>;
         },
       },
       {
-        title: '主题',
+        title: '活动主题',
         className: 'ant-tableThead',
         dataIndex: 'topic',
+        width: 200,
       },
       {
-        title: '内容',
+        title: '活动封面',
+        className: 'ant-tableThead',
+        dataIndex: 'cover',
+        width: 200,
+        render: (text) => {
+          return <img src={text} style={{width:80}} />
+        }
+      },
+      {
+        title: '活动banner',
+        className: 'ant-tableThead',
+        dataIndex: 'banner',
+        width: 200,
+        render: (text) => {
+          return <img src={text} style={{width:80}} />
+        }
+      },
+      {
+        title: '活动简介',
+        className: 'ant-tableThead',
+        dataIndex: 'describe',
+        width: 200,
+      },
+      {
+        title: '活动内容',
         className: 'ant-tableThead',
         dataIndex: 'content',
+        width: 200,
+      },
+      {
+        title: '活动规则',
+        className: 'ant-tableThead',
+        dataIndex: 'rule',
+        width: 200,
       },
       {
         title: '开始时间',
         className: 'ant-tableThead',
         dataIndex: 'start_time',
+        width: 180,
         render: (text) => {
           return <span>{moment(text).format('YYYY-MM-DD HH:mm:ss')}</span>;
         },
@@ -360,6 +421,7 @@ export class ActivityChecked extends Component {
         title: '结束时间',
         className: 'ant-tableThead',
         dataIndex: 'end_time',
+        width: 180,
         render: (text) => {
           return <span>{moment(text).format('YYYY-MM-DD HH:mm:ss')}</span>;
         },
@@ -368,6 +430,7 @@ export class ActivityChecked extends Component {
         title: '创建时间',
         className: 'ant-tableThead',
         dataIndex: 'create_time',
+        width: 180,
         render: (text) => {
           return <span>{moment(text).format('YYYY-MM-DD HH:mm:ss')}</span>;
         },
@@ -377,6 +440,7 @@ export class ActivityChecked extends Component {
         className: 'ant-tableThead',
         key: 'action',
         width: 300,
+        fixed: 'right',
         render: (text, record, index) => {
           return (
             <span>
@@ -459,6 +523,8 @@ export class ActivityChecked extends Component {
 
         <Row>
           <Table
+            width={800}
+            scroll={{ x: 2480 }}
             columns={columns}
             rowKey={record => record.id || 0}
             dataSource={this.state.tableData}
@@ -486,7 +552,7 @@ export class ActivityChecked extends Component {
             </Button>,
           ]}
         >
-          <Form width={800}>
+          <Form onSubmit={this.handleSubmit} width={800}>
             <FormItem {...formItemLayout} label="活动编号">
               {getFieldDecorator('number', {
                 rules: customRules,
@@ -494,18 +560,18 @@ export class ActivityChecked extends Component {
               })(<Input placeholder="请输入活动编号" />)}
             </FormItem>
 
-            <FormItem {...formItemLayout} label="活动名称">
-              {getFieldDecorator('name', {
-                rules: customRules,
-                initialValue: this.state.name,
-              })(<Input placeholder="请输入活动名称" />)}
-            </FormItem>
-
             <FormItem {...formItemLayout} label="发起者">
               {getFieldDecorator('initiator', {
                 rules: customRules,
                 initialValue: this.state.initiator,
               })(<Input placeholder="请输入活动发起者" />)}
+            </FormItem>
+
+            <FormItem {...formItemLayout} label="活动标题">
+              {getFieldDecorator('name', {
+                rules: customRules,
+                initialValue: this.state.name,
+              })(<Input placeholder="请输入活动标题" />)}
             </FormItem>
 
             <FormItem {...formItemLayout} label="类别">
@@ -526,14 +592,78 @@ export class ActivityChecked extends Component {
               })(<Input placeholder="请输入活动主题" />)}
             </FormItem>
 
-            <FormItem {...formItemLayout} label="活动详情正文">
+            <FormItem {...formItemLayout} label="封面">
+              {getFieldDecorator('cover', {
+                rules: customRules,
+              })(
+                <UploadImgs
+                  isEnhanceSingle
+                  limit={1}
+                  defaultFileList={this.state.defaultFileList}
+                  handleUploadChange={fileList => this.handleUploadChange(fileList, 'cover')}
+                />
+              )}
+            </FormItem>
+
+            <FormItem {...formItemLayout} label="banner">
+              {getFieldDecorator('banner', {
+                rules: customRules,
+              })(
+                <UploadImgs
+                  isEnhanceSingle
+                  limit={1}
+                  defaultFileList={this.state.defaultFileList}
+                  handleUploadChange={fileList => this.handleUploadChange(fileList, 'banner')}
+                />
+              )}
+            </FormItem>
+
+            <FormItem {...formItemLayout} label="活动简介">
+              {getFieldDecorator('describe', {
+                rules: customRules,
+                initialValue: this.state.describe,
+              })(
+                <TextArea
+                  placeholder="请录入 MarkDown 格式的活动简介"
+                  autosize={{ minRows: 6, maxRows: 20 }}
+                />
+              )}
+            </FormItem>
+
+            <FormItem {...formItemLayout} label="活动内容">
               {getFieldDecorator('content', {
                 rules: customRules,
                 initialValue: this.state.content,
               })(
                 <TextArea
-                  placeholder="请录入 MarkDown 格式的活动详情正文"
+                  placeholder="请录入 MarkDown 格式的活动内容"
                   autosize={{ minRows: 6, maxRows: 20 }}
+                />
+              )}
+            </FormItem>
+
+            <FormItem {...formItemLayout} label="活动规则">
+              {getFieldDecorator('rule', {
+                rules: customRules,
+                initialValue: this.state.rule,
+              })(
+                <TextArea
+                  placeholder="请录入 MarkDown 格式的活动规则"
+                  autosize={{ minRows: 6, maxRows: 20 }}
+                />
+              )}
+            </FormItem>
+
+            <FormItem {...formItemLayout} label="活动时间">
+              {getFieldDecorator('range-time-picker', {
+                rules: customRules,
+              })(
+                <RangePicker 
+                  disabledDate={this.disabledDate}
+                  showTime={{
+                    hideDisabledOptions: true,
+                    defaultValue: [moment('00:00:00', 'HH:mm:ss'), moment('23:59:59', 'HH:mm:ss')],
+                  }}
                 />
               )}
             </FormItem>
