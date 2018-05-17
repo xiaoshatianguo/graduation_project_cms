@@ -44,7 +44,7 @@ export class CertifiedArchitectInfo extends Component {
     modalVisible: false,
     editFormTitle: '',
 
-    number: '',
+    // number: '',
     email: '',
     phone: '',
     password: '',
@@ -96,7 +96,7 @@ export class CertifiedArchitectInfo extends Component {
   handleRowEditClick = (index, record) => {
     let {
       id = -1,
-      number,
+      // number,
       email,
       phone,
       password,
@@ -135,7 +135,7 @@ export class CertifiedArchitectInfo extends Component {
     });
 
     this.props.form.setFieldsValue({
-      number,
+      // number,
       email,
       phone,
       password,
@@ -325,7 +325,7 @@ export class CertifiedArchitectInfo extends Component {
       payload: {
         currentPage,
         curPageSize,
-        number: searchNumber,
+        // number: searchNumber,
         nickname: searchNickName,
         status: 0,
         sort: 2
@@ -345,13 +345,13 @@ export class CertifiedArchitectInfo extends Component {
 
   render() {
     const columns = [
-      {
-        title: '编号',
-        className: 'ant-tableThead',
-        dataIndex: 'number',
-        width: 80,
-        fixed: 'left',
-      },
+      // {
+      //   title: '编号',
+      //   className: 'ant-tableThead',
+      //   dataIndex: 'number',
+      //   width: 80,
+      //   fixed: 'left',
+      // },
       {
         title: '昵称',
         className: 'ant-tableThead',
@@ -384,7 +384,6 @@ export class CertifiedArchitectInfo extends Component {
         dataIndex: 'password',
         width: 100,
       },
-      
       {
         title: '性别',
         className: 'ant-tableThead',
@@ -448,15 +447,15 @@ export class CertifiedArchitectInfo extends Component {
           return <span>{moment(text).format('YYYY-MM-DD HH:mm:ss')}</span>;
         },
       },
-      {
-        title: '最后登录时间',
-        className: 'ant-tableThead',
-        dataIndex: 'lastest_login_time',
-        width: 160,
-        render: (text) => {
-          return <span>{ !!text ? moment(text).format('YYYY-MM-DD HH:mm:ss') : '-' }</span>;
-        },
-      },
+      // {
+      //   title: '最后登录时间',
+      //   className: 'ant-tableThead',
+      //   dataIndex: 'lastest_login_time',
+      //   width: 160,
+      //   render: (text) => {
+      //     return <span>{ !!text ? moment(text).format('YYYY-MM-DD HH:mm:ss') : '-' }</span>;
+      //   },
+      // },
       {
         title: '操作',
         className: 'ant-tableThead',
@@ -513,7 +512,29 @@ export class CertifiedArchitectInfo extends Component {
         content="管理已经通过审核的活动信息。"
       >
         <Card>
-          <Row gutter={24}>
+          <Row className="lw-top-col" type="flex" align="middle" justify="space-between">
+            <Form layout="inline">
+              <FormItem label="认证师昵称：">
+                  <Input
+                      name="searchNickName"
+                      placeholder="请输入认证师昵称"
+                      defaultValue={this.state.searchNickName}
+                      onChange={this.handleInputChange}
+                  />
+              </FormItem>
+
+              <FormItem>
+                  <Button icon="search" type="primary" onClick={this.handleSearchSubmit} htmlType="submit">查询</Button>
+              </FormItem>
+
+              <FormItem>
+                <Button type="primary" icon="plus" onClick={() => this.handleModalVisible(true)}>
+                  新增认证师
+                </Button>
+              </FormItem>
+            </Form>
+          </Row>
+          {/* <Row gutter={24}>
             <Col span={3}>
               <h4>认证师编号：</h4>
             </Col>
@@ -540,13 +561,13 @@ export class CertifiedArchitectInfo extends Component {
                 新增认证师
               </Button>
             </Col>
-          </Row>
+          </Row> */}
         </Card>
 
         <Row>
           <Table
             width={800}
-            scroll={{ x: 2190 }}
+            scroll={{ x: 2030 }}
             columns={columns}
             rowKey={record => record.id || 0}
             dataSource={this.state.tableData}
@@ -556,6 +577,7 @@ export class CertifiedArchitectInfo extends Component {
               pageSize: curPageSize,
               total: tableDataTotal,
             }}
+            style={{'backgroundColor':'#fff'}}
             onChange={this.handleTableChange}
           />
         </Row>
@@ -568,12 +590,12 @@ export class CertifiedArchitectInfo extends Component {
           onCancel={() => this.handleModalVisible(false)}
         >
           <Form onSubmit={this.handleSubmit} width={800}>
-            <FormItem {...formItemLayout} label="编号">
+            {/* <FormItem {...formItemLayout} label="编号">
               {getFieldDecorator('number', {
                 rules: customRules,
                 initialValue: this.state.number,
               })(<Input placeholder="请输入编号" />)}
-            </FormItem>
+            </FormItem> */}
 
             <FormItem {...formItemLayout} label="昵称">
               {getFieldDecorator('nickname', {

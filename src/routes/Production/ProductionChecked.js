@@ -39,7 +39,7 @@ export class ProductionChecked extends Component {
     modalVisible: false,
     editFormTitle: '',
 
-    number: '',
+    // number: '',
     name: '',
     author: '',
     sort: '',
@@ -106,7 +106,7 @@ export class ProductionChecked extends Component {
   handleRowEditClick = (index, record) => {
     let {
       id = -1,
-      number,
+      // number,
       name,
       author,
       sort,
@@ -130,7 +130,7 @@ export class ProductionChecked extends Component {
     });
 
     this.props.form.setFieldsValue({
-      number,
+      // number,
       name,
       author,
       sort,
@@ -145,7 +145,7 @@ export class ProductionChecked extends Component {
   handleAudit= async (index, record) => {
     let { 
       id = -1,
-      number,
+      // number,
       name,
       author,
       sort,
@@ -166,7 +166,7 @@ export class ProductionChecked extends Component {
     });
 
     this.props.form.setFieldsValue({
-      number,
+      // number,
       name,
       author,
       sort,
@@ -290,7 +290,7 @@ export class ProductionChecked extends Component {
       payload: {
         currentPage,
         curPageSize,
-        number: searchNumber,
+        // number: searchNumber,
         name: searchName,
         author: searchAuthor,
         sort: searchSort,
@@ -319,25 +319,30 @@ export class ProductionChecked extends Component {
     }
 
     const columns = [
-      {
-        title: '编号',
-        className: 'ant-tableThead',
-        dataIndex: 'number',
-      },
+      // {
+      //   title: '编号',
+      //   className: 'ant-tableThead',
+      //   dataIndex: 'number',
+      // },
       {
         title: '作品名称',
         className: 'ant-tableThead',
         dataIndex: 'name',
+        width: 160,
+        fixed: 'left',
       },
       {
         title: '作者',
         className: 'ant-tableThead',
         dataIndex: 'author',
+        width: 160,
+        fixed: 'left',
       },
       {
         title: '分类',
         className: 'ant-tableThead',
         dataIndex: 'sort',
+        width: 160,
         render: (text) => {
           return <span>{ this.state.categoriesList[text] }</span>;
         },
@@ -355,26 +360,31 @@ export class ProductionChecked extends Component {
         title: '简介',
         className: 'ant-tableThead',
         dataIndex: 'describe',
+        width: 160,
       },
       {
         title: '摄影道具',
         className: 'ant-tableThead',
         dataIndex: 'photography_props',
+        width: 160,
       },
       {
         title: '摄影地点',
         className: 'ant-tableThead',
         dataIndex: 'photography_site',
+        width: 160,
       },
       {
         title: '描述详情',
         className: 'ant-tableThead',
         dataIndex: 'content',
+        width: 160,
       },
       {
         title: '创建时间',
         className: 'ant-tableThead',
         dataIndex: 'create_time',
+        width: 160,
         render: (text) => {
           return <span>{ !!text ? moment(text).format('YYYY-MM-DD HH:mm:ss') : '-' }</span>;
         },
@@ -384,6 +394,7 @@ export class ProductionChecked extends Component {
         className: 'ant-tableThead',
         key: 'action',
         width: 300,
+        fixed: 'right',
         render: (text, record, index) => {
           const { id = -1 } = record;
 
@@ -426,7 +437,45 @@ export class ProductionChecked extends Component {
         content="审核认证师提交的作品申请。"
       >
         <Card>
-          <Row gutter={24}>
+          <Row className="lw-top-col" type="flex" align="middle" justify="space-between">
+              <Form layout="inline">
+                  <FormItem label="作品名称：">
+                      <Input
+                          name="searchName"
+                          placeholder="请输入作品名称"
+                          defaultValue={this.state.searchName}
+                          onChange={this.handleInputChange}
+                      />
+                  </FormItem>
+
+                  <FormItem label="作品作者：">
+                      <Input
+                          name="searchAuthor"
+                          placeholder="请输入作品作者"
+                          defaultValue={this.state.searchAuthor}
+                          onChange={this.handleInputChange}
+                      />
+                  </FormItem>
+
+                  <FormItem label="作品类别：">
+                    <Select
+                        allowClear={true}
+                        placeholder="选择管理员类别"
+                        style={{ width: 150}}
+                        onChange={(value) => {
+                            this.setState({searchCategories: value});
+                        }}
+                    >
+                      { categoriesOption }
+                    </Select>
+                  </FormItem>
+
+                  <FormItem>
+                      <Button icon="search" type="primary" onClick={this.handleSearchSubmit} htmlType="submit">查询</Button>
+                  </FormItem>
+              </Form>
+          </Row>
+          {/* <Row gutter={24}>
             <Col span={3}>
               <h4>作品编号：</h4>
             </Col>
@@ -472,11 +521,13 @@ export class ProductionChecked extends Component {
             <Col span={2}>
               <Button icon="search" htmlType="submit" onClick={this.handleSearchSubmit}>查询</Button>
             </Col>
-          </Row>
+          </Row> */}
         </Card>
 
         <Row>
           <Table
+            width={800}
+            scroll={{ x: 1660 }}
             columns={columns}
             rowKey={record => record.id || 0}
             dataSource={this.state.tableData}
@@ -486,6 +537,7 @@ export class ProductionChecked extends Component {
               pageSize: curPageSize,
               total: tableDataTotal,
             }}
+            style={{'backgroundColor':'#fff'}}
             onChange={this.handleTableChange}
           />
         </Row>
@@ -505,12 +557,12 @@ export class ProductionChecked extends Component {
           ]}
         >
           <Form onSubmit={this.handleSubmit} width={800}>
-            <FormItem {...formItemLayout} label="编号">
+            {/* <FormItem {...formItemLayout} label="编号">
               {getFieldDecorator('number', {
                 rules: customRules,
                 initialValue: this.state.number,
               })(<Input />)}
-            </FormItem>
+            </FormItem> */}
 
             <FormItem {...formItemLayout} label="作品标题">
               {getFieldDecorator('name', {

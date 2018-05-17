@@ -44,7 +44,7 @@ export class CertifiedArchitectChecked extends Component {
     modalVisible: false,
     editFormTitle: '',
 
-    number: '',
+    // number: '',
     email: '',
     phone: '',
     password: '',
@@ -93,7 +93,7 @@ export class CertifiedArchitectChecked extends Component {
   handleRowEditClick = (index, record) => {
     let {
       id = -1,
-      number,
+      // number,
       email,
       phone,
       password,
@@ -120,7 +120,7 @@ export class CertifiedArchitectChecked extends Component {
     });
 
     this.props.form.setFieldsValue({
-      number,
+      // number,
       email,
       phone,
       password,
@@ -138,7 +138,7 @@ export class CertifiedArchitectChecked extends Component {
   handleAudit= async (index, record) => {
     let { 
       id = -1,
-      number,
+      // number,
       email,
       phone,
       password,
@@ -162,7 +162,7 @@ export class CertifiedArchitectChecked extends Component {
     });
 
     this.props.form.setFieldsValue({
-      number,
+      // number,
       email,
       phone,
       password,
@@ -288,7 +288,7 @@ export class CertifiedArchitectChecked extends Component {
       payload: {
         currentPage,
         curPageSize,
-        number: searchNumber,
+        // number: searchNumber,
         name: searchNickName,
         status: 1,
         sort: 2
@@ -308,13 +308,13 @@ export class CertifiedArchitectChecked extends Component {
 
   render() {
     const columns = [
-      {
-        title: '编号',
-        className: 'ant-tableThead',
-        dataIndex: 'number',
-        width: 80,
-        fixed: 'left',
-      },
+      // {
+      //   title: '编号',
+      //   className: 'ant-tableThead',
+      //   dataIndex: 'number',
+      //   width: 80,
+      //   fixed: 'left',
+      // },
       {
         title: '昵称',
         className: 'ant-tableThead',
@@ -459,7 +459,23 @@ export class CertifiedArchitectChecked extends Component {
         content="审核认证师提交的认证师申请。"
       >
         <Card>
-          <Row gutter={24}>
+          <Row className="lw-top-col" type="flex" align="middle" justify="space-between">
+            <Form layout="inline">
+              <FormItem label="认证师昵称：">
+                  <Input
+                      name="searchNickName"
+                      placeholder="请输入认证师昵称"
+                      defaultValue={this.state.searchNickName}
+                      onChange={this.handleInputChange}
+                  />
+              </FormItem>
+
+              <FormItem>
+                  <Button icon="search" type="primary" onClick={this.handleSearchSubmit} htmlType="submit">查询</Button>
+              </FormItem>
+            </Form>
+          </Row>
+          {/* <Row gutter={24}>
             <Col span={3}>
               <h4>认证师编号：</h4>
             </Col>
@@ -481,7 +497,7 @@ export class CertifiedArchitectChecked extends Component {
             <Col span={2}>
               <Button icon="search" htmlType="submit" onClick={this.handleSearchSubmit}>查询</Button>
             </Col>
-          </Row>
+          </Row> */}
         </Card>
 
         <Row>
@@ -497,6 +513,7 @@ export class CertifiedArchitectChecked extends Component {
               pageSize: curPageSize,
               total: tableDataTotal,
             }}
+            style={{'backgroundColor':'#fff'}}
             onChange={this.handleTableChange}
           />
         </Row>
@@ -516,12 +533,12 @@ export class CertifiedArchitectChecked extends Component {
           ]}
         >
           <Form onSubmit={this.handleSubmit} width={800}>
-            <FormItem {...formItemLayout} label="编号">
+            {/* <FormItem {...formItemLayout} label="编号">
               {getFieldDecorator('number', {
                 rules: customRules,
                 initialValue: this.state.number,
               })(<Input placeholder="请输入编号" />)}
-            </FormItem>
+            </FormItem> */}
 
             <FormItem {...formItemLayout} label="昵称">
               {getFieldDecorator('nickname', {

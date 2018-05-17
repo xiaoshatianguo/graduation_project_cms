@@ -42,7 +42,7 @@ export class MembersManage extends Component {
     modalVisible: false,
     editFormTitle: '',
 
-    number: '',
+    // number: '',
     email: '',
     phone: '',
     password: '',
@@ -95,7 +95,7 @@ export class MembersManage extends Component {
   handleRowEditClick = (index, record) => {
     let { 
       id = -1, 
-      number,
+      // number,
       email,
       phone,
       password,
@@ -134,7 +134,7 @@ export class MembersManage extends Component {
     });
 
     this.props.form.setFieldsValue({
-      number,
+      // number,
       email,
       phone,
       password,
@@ -194,7 +194,7 @@ export class MembersManage extends Component {
       tableData,
     });
 
-    message.info(`${record.number}${record.nickname}已删除 ☠`);
+    message.info(`${record.nickname}已删除 ☠`);
   };
 
   handleModalVisible = (flag) => {
@@ -323,7 +323,7 @@ export class MembersManage extends Component {
       payload: {
         currentPage,
         curPageSize,
-        number: searchNumber,
+        // number: searchNumber,
         nickname: searchNickName,
         sort: '0',
       },
@@ -342,13 +342,6 @@ export class MembersManage extends Component {
 
   render() {
     const columns = [
-      {
-        title: '编号',
-        className: 'ant-tableThead',
-        dataIndex: 'number',
-        width: 80,
-        fixed: 'left',
-      },
       {
         title: '昵称',
         className: 'ant-tableThead',
@@ -375,13 +368,6 @@ export class MembersManage extends Component {
         dataIndex: 'phone',
         width: 120,
       },
-      {
-        title: '密码',
-        className: 'ant-tableThead',
-        dataIndex: 'password',
-        width: 100,
-      },
-      
       {
         title: '性别',
         className: 'ant-tableThead',
@@ -517,7 +503,27 @@ export class MembersManage extends Component {
         content="用户列表管理"
       >
         <Card>
-          <Row gutter={24}>
+          <Row className="lw-top-col" type="flex" align="middle" justify="space-between">
+              <Form layout="inline">
+                  <FormItem label="用户昵称：">
+                      <Input
+                          name="searchNickName"
+                          placeholder="请输入用户昵称"
+                          defaultValue={this.state.searchNickName}
+                          onChange={this.handleInputChange}
+                      />
+                  </FormItem>
+
+                  <FormItem>
+                      <Button icon="search" type="primary" onClick={this.handleSearchSubmit} htmlType="submit">查询</Button>
+                  </FormItem>
+
+                  {/* <FormItem>
+                      <Button type="primary" icon="plus" onClick={() => this.handleModalVisible(true)}>新增用户</Button>
+                  </FormItem> */}
+              </Form>
+          </Row>
+          {/* <Row gutter={24}>
             <Col span={3}>
               <h4>用户编号：</h4>
             </Col>
@@ -544,13 +550,13 @@ export class MembersManage extends Component {
                 新增用户
               </Button>
             </Col>
-          </Row>
+          </Row> */}
         </Card>
 
         <Row>
           <Table
             width={800}
-            scroll={{ x: 2190 }}
+            scroll={{ x: 2030 }}
             columns={columns}
             rowKey={record => record.id || 0}
             dataSource={this.state.tableData}
@@ -560,6 +566,7 @@ export class MembersManage extends Component {
               pageSize: curPageSize,
               total: tableDataTotal,
             }}
+            style={{'backgroundColor':'#fff'}}
             onChange={this.handleTableChange}
           />
         </Row>
@@ -572,13 +579,6 @@ export class MembersManage extends Component {
           onCancel={() => this.handleModalVisible(false)}
         >
           <Form onSubmit={this.handleSubmit} width={800}>
-            <FormItem {...formItemLayout} label="编号">
-              {getFieldDecorator('number', {
-                rules: customRules,
-                initialValue: this.state.number,
-              })(<Input placeholder="请输入编号" />)}
-            </FormItem>
-
             <FormItem {...formItemLayout} label="昵称">
               {getFieldDecorator('nickname', {
                 rules: customRules,

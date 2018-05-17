@@ -3,10 +3,7 @@
  */
 
 /* 程序调用接口的前缀 */
-// TODO: 更改接口服务器地址
-// export const apiPrefix = 'http://39.108.75.149:7001'; // 测试服地址
-// export const apiPrefix = 'http://120.76.189.133:7001'; // 正式服地址
-export const apiPrefix = 'http://127.0.0.1:7001';
+export const apiPrefix = 'http://sy.hndjfs.com';
 
 /* 异步请求接口超时的时长，以秒作为单位 */
 export const timeout = '30';
@@ -25,7 +22,6 @@ export const dateFormat = 'YYYY-MM-DD';
 export const bunchStrsSeparator = '、';
 
 /* 七牛bucket空间名称 */
-// TODO: 更改七牛云地址
 export const qiniuBucket = 'xiaosha';
 export const qiniuDomain = 'http://p1s12lchv.bkt.clouddn.com';
 export const qiniuUploadApi = '//upload-z2.qiniu.com/';

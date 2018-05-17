@@ -49,7 +49,7 @@ export class AdminManage extends Component {
     editFormTitle: '',
 
     id: '', // 表格数据
-    number: '',
+    // number: '',
     nick_name: '',
     password: '',
     sex: '',
@@ -116,7 +116,10 @@ export class AdminManage extends Component {
   };
 
   handleRowEditClick = (index, record) => {
-    let { id = -1, number, nick_name, password, sex, integral, manage_categories, status } = record;
+    let {
+      id = -1, nick_name, password, sex, integral, manage_categories, status
+    } = record;
+
     this.tableCurIndex = index;
 
     sex += '';
@@ -135,7 +138,7 @@ export class AdminManage extends Component {
     });
 
     this.props.form.setFieldsValue({
-      number,
+      // number,
       nick_name,
       password,
       sex,
@@ -188,7 +191,7 @@ export class AdminManage extends Component {
       tableData,
     });
 
-    message.info(`${record.number}${record.nick_name}已删除`);
+    message.info(`${record.nick_name}已删除`);
   };
 
   handleModalVisible = (flag) => {
@@ -301,7 +304,7 @@ export class AdminManage extends Component {
       payload: {
         currentPage,
         curPageSize,
-        number: searchNumber,
+        // number: searchNumber,
         nick_name: searchNickName,
         integral: searchIntegral,
         manage_categories: searchCategories,
@@ -329,11 +332,11 @@ export class AdminManage extends Component {
     }
 
     const columns = [
-      {
-        title: '编号',
-        className: 'ant-tableThead',
-        dataIndex: 'number',
-      },
+      // {
+      //   title: '编号',
+      //   className: 'ant-tableThead',
+      //   dataIndex: 'number',
+      // },
       {
         title: '昵称',
         className: 'ant-tableThead',
@@ -377,15 +380,15 @@ export class AdminManage extends Component {
           return <span>{moment(text).format('YYYY-MM-DD HH:mm:ss')}</span>;
         },
       },
-      {
-        title: '最后登录时间',
-        className: 'ant-tableThead',
-        dataIndex: 'lastest_login_time',
-        width: 160,
-        render: (text) => {
-          return <span>{ !!text ? moment(text).format('YYYY-MM-DD HH:mm:ss') : '-'}</span>;
-        },
-      },
+      // {
+      //   title: '最后登录时间',
+      //   className: 'ant-tableThead',
+      //   dataIndex: 'lastest_login_time',
+      //   width: 160,
+      //   render: (text) => {
+      //     return <span>{ !!text ? moment(text).format('YYYY-MM-DD HH:mm:ss') : '-'}</span>;
+      //   },
+      // },
       {
         title: '操作',
         className: 'ant-tableThead',
@@ -459,16 +462,56 @@ export class AdminManage extends Component {
         content="分配不同类别的管理员"
       >
         <Card>
-          <Row gutter={24}>
-            <Col span={3}>
-              <h4>管理员编号：</h4>
-            </Col>
-            <Col span={4}>
-              <Input 
-                name="searchNumber"
-                onChange={this.handleInputChange}
-              />
-            </Col>
+          <Row className="lw-top-col" type="flex" align="middle" justify="space-between">
+              <Form layout="inline">
+                  <FormItem label="管理员昵称：">
+                      <Input
+                          name="searchNickName"
+                          placeholder="请输入管理员昵称"
+                          defaultValue={this.state.searchNickName}
+                          onChange={this.handleInputChange}
+                      />
+                  </FormItem>
+
+                  <FormItem label="管理员权限：">
+                    <Select
+                        allowClear={true}
+                        placeholder="选择管理员权限"
+                        style={{ width: 150}}
+                        onChange={(value) => {
+                            this.setState({searchIntegral: value});
+                        }}
+                    >
+                      <Option value="0">超级管理员</Option>
+                      <Option value="1">普通管理员</Option>
+                    </Select>
+                  </FormItem>
+
+                  <FormItem label="管理员权限：">
+                    <Select
+                        allowClear={true}
+                        placeholder="选择管理员类别"
+                        style={{ width: 150}}
+                        onChange={(value) => {
+                            this.setState({searchCategories: value});
+                        }}
+                    >
+                      { categoriesOption }
+                    </Select>
+                  </FormItem>
+
+                  <FormItem>
+                      <Button icon="search" type="primary" onClick={this.handleSearchSubmit} htmlType="submit">查询</Button>
+                  </FormItem>
+
+                  <FormItem>
+                    <Button type="primary" icon="plus" onClick={() => this.handleModalVisible(true)}>
+                      新增管理员
+                    </Button>
+                  </FormItem>
+              </Form>
+          </Row>
+          {/* <Row gutter={24}>
             <Col span={3}>
               <h4>管理员昵称：</h4>
             </Col>
@@ -517,7 +560,7 @@ export class AdminManage extends Component {
                 新增管理员
               </Button>
             </Col>
-          </Row>
+          </Row> */}
         </Card>
 
         <Row>
@@ -543,12 +586,12 @@ export class AdminManage extends Component {
           onCancel={() => this.handleModalVisible(false)}
         >
           <Form onSubmit={this.handleSubmit} width={800}>
-            <FormItem {...formItemLayout} label="编号">
+            {/* <FormItem {...formItemLayout} label="编号">
               {getFieldDecorator('number', {
                 rules: customRules,
                 initialValue: this.state.number,
               })(<Input />)}
-            </FormItem>
+            </FormItem> */}
 
             <FormItem {...formItemLayout} label="昵称">
               {getFieldDecorator('nick_name', {

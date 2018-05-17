@@ -41,7 +41,7 @@ export class ActivityInfo extends Component {
     modalVisible: false,
     editFormTitle: '',
 
-    number: '',
+    // number: '',
     name: '',
     initiator: '',
     sort: '',
@@ -111,7 +111,7 @@ export class ActivityInfo extends Component {
   handleRowEditClick = (index, record) => {
     let {
       id = -1,
-      number,
+      // number,
       name,
       initiator,
       sort,
@@ -139,7 +139,7 @@ export class ActivityInfo extends Component {
     });
 
     this.props.form.setFieldsValue({
-      number,
+      // number,
       name,
       initiator,
       sort,
@@ -367,13 +367,13 @@ export class ActivityInfo extends Component {
     }
 
     const columns = [
-      {
-        title: '编号',
-        className: 'ant-tableThead',
-        dataIndex: 'number',
-        width: 80,
-        fixed: 'left',
-      },
+      // {
+      //   title: '编号',
+      //   className: 'ant-tableThead',
+      //   dataIndex: 'number',
+      //   width: 80,
+      //   fixed: 'left',
+      // },
       {
         title: '发起者',
         className: 'ant-tableThead',
@@ -534,7 +534,51 @@ export class ActivityInfo extends Component {
         content="管理已经通过审核的活动信息。"
       >
         <Card>
-          <Row gutter={24}>
+          <Row className="lw-top-col" type="flex" align="middle" justify="space-between">
+            <Form layout="inline">
+              <FormItem label="活动发起人：">
+                  <Input
+                      name="searchInitiator"
+                      placeholder="请输入活动发起人"
+                      defaultValue={this.state.searchInitiator}
+                      onChange={this.handleInputChange}
+                  />
+              </FormItem>
+
+              <FormItem label="活动名称：">
+                  <Input
+                      name="searchName"
+                      placeholder="请输入活动名称"
+                      defaultValue={this.state.searchName}
+                      onChange={this.handleInputChange}
+                  />
+              </FormItem>
+
+              <FormItem label="活动类别：">
+                <Select
+                    allowClear={true}
+                    placeholder="选择活动类别"
+                    style={{ width: 150}}
+                    onChange={(value) => {
+                        this.setState({searchSort: value});
+                    }}
+                >
+                  { categoriesOption }
+                </Select>
+              </FormItem>
+
+              <FormItem>
+                  <Button icon="search" type="primary" onClick={this.handleSearchSubmit} htmlType="submit">查询</Button>
+              </FormItem>
+
+              <FormItem>
+                <Button type="primary" icon="plus" onClick={() => this.handleModalVisible(true)}>
+                  新增官方活动
+                </Button>
+              </FormItem>
+            </Form>
+          </Row>
+          {/* <Row gutter={24}>
             <Col span={3}>
               <h4>活动发起人：</h4>
             </Col>
@@ -576,7 +620,7 @@ export class ActivityInfo extends Component {
                 新增官方活动
               </Button>
             </Col>
-          </Row>
+          </Row> */}
         </Card>
 
         <Row>
@@ -592,6 +636,7 @@ export class ActivityInfo extends Component {
               pageSize: curPageSize,
               total: tableDataTotal,
             }}
+            style={{'backgroundColor':'#fff'}}
             onChange={this.handleTableChange}
           />
         </Row>
@@ -604,12 +649,12 @@ export class ActivityInfo extends Component {
           onCancel={() => this.handleModalVisible(false)}
         >
           <Form onSubmit={this.handleSubmit} width={800}>
-            <FormItem {...formItemLayout} label="活动编号">
+            {/* <FormItem {...formItemLayout} label="活动编号">
               {getFieldDecorator('number', {
                 rules: customRules,
                 initialValue: this.state.number,
               })(<Input placeholder="请输入活动编号" />)}
-            </FormItem>
+            </FormItem> */}
 
             <FormItem {...formItemLayout} label="发起者">
               {getFieldDecorator('initiator', {
