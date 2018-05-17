@@ -431,20 +431,20 @@ export class MembersManage extends Component {
           return <span>{moment(text).format('YYYY-MM-DD HH:mm:ss')}</span>;
         },
       },
-      {
-        title: '最后登录时间',
-        className: 'ant-tableThead',
-        dataIndex: 'lastest_login_time',
-        width: 160,
-        render: (text) => {
-          return <span>{ !!text ? moment(text).format('YYYY-MM-DD HH:mm:ss') : '-' }</span>;
-        },
-      },
+      // {
+      //   title: '最后登录时间',
+      //   className: 'ant-tableThead',
+      //   dataIndex: 'lastest_login_time',
+      //   width: 160,
+      //   render: (text) => {
+      //     return <span>{ !!text ? moment(text).format('YYYY-MM-DD HH:mm:ss') : '-' }</span>;
+      //   },
+      // },
       {
         title: '操作',
         className: 'ant-tableThead',
         key: 'action',
-        width: 300,
+        width: 200,
         fixed: 'right',
         render: (text, record, index) => {
           const { id = -1 } = record;
@@ -556,7 +556,7 @@ export class MembersManage extends Component {
         <Row>
           <Table
             width={800}
-            scroll={{ x: 2030 }}
+            scroll={{ x: 1830 }}
             columns={columns}
             rowKey={record => record.id || 0}
             dataSource={this.state.tableData}

@@ -333,26 +333,23 @@ export class CertifiedArchitectChecked extends Component {
         title: '邮箱',
         className: 'ant-tableThead',
         dataIndex: 'email',
-        width: 200,
       },
       {
         title: '手机',
         className: 'ant-tableThead',
         dataIndex: 'phone',
-        width: 120,
       },
-      {
-        title: '密码',
-        className: 'ant-tableThead',
-        dataIndex: 'password',
-        width: 100,
-      },
+      // {
+      //   title: '密码',
+      //   className: 'ant-tableThead',
+      //   dataIndex: 'password',
+      //   width: 100,
+      // },
       
       {
         title: '性别',
         className: 'ant-tableThead',
         dataIndex: 'sex',
-        width: 80,
         render: (text) => {
           return <span>{ sexList[text] }</span>;
         },
@@ -361,7 +358,6 @@ export class CertifiedArchitectChecked extends Component {
         title: '年龄',
         className: 'ant-tableThead',
         dataIndex: 'age',
-        width: 80,
         render: (text) => {
           return <span>{ text }岁</span>;
         },
@@ -370,13 +366,11 @@ export class CertifiedArchitectChecked extends Component {
         title: '地址',
         className: 'ant-tableThead',
         dataIndex: 'address',
-        width: 150,
       },
       {
         title: '头像',
         className: 'ant-tableThead',
         dataIndex: 'portrait',
-        width: 80,
         render: (text) => {
           return <Avatar shape="square" src={text} size="large" />;
         },
@@ -385,32 +379,29 @@ export class CertifiedArchitectChecked extends Component {
         title: '宣言',
         className: 'ant-tableThead',
         dataIndex: 'personal_statement',
-        width: 200,
       },
       {
         title: '积分',
         className: 'ant-tableThead',
         dataIndex: 'integral',
-        width: 80,
       },
       {
         title: '创建时间',
         className: 'ant-tableThead',
         dataIndex: 'create_time',
-        width: 160,
         render: (text) => {
           return <span>{moment(text).format('YYYY-MM-DD HH:mm:ss')}</span>;
         },
       },
-      {
-        title: '最后登录时间',
-        className: 'ant-tableThead',
-        dataIndex: 'lastest_login_time',
-        width: 160,
-        render: (text) => {
-          return <span>{ !!text ? moment(text).format('YYYY-MM-DD HH:mm:ss') : '-' }</span>;
-        },
-      },
+      // {
+      //   title: '最后登录时间',
+      //   className: 'ant-tableThead',
+      //   dataIndex: 'lastest_login_time',
+      //   width: 160,
+      //   render: (text) => {
+      //     return <span>{ !!text ? moment(text).format('YYYY-MM-DD HH:mm:ss') : '-' }</span>;
+      //   },
+      // },
       {
         title: '操作',
         className: 'ant-tableThead',
@@ -503,7 +494,7 @@ export class CertifiedArchitectChecked extends Component {
         <Row>
           <Table
             width={800}
-            scroll={{ x: 1990 }}
+            scroll={{ x: 1930 }}
             columns={columns}
             rowKey={record => record.id || 0}
             dataSource={this.state.tableData}

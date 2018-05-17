@@ -308,3 +308,18 @@ export const getUuidFileName = () => {
 
   return encodeURI(`${curr}/${suffix}`);
 };
+
+// text格式后文变省略号
+export const TextToF = (value) => {
+  if(value.length === 0){
+      return
+  }
+  let num = value.length;
+  if(num >= 10){
+      value = value.substring(0,10)
+      value = value + '......'
+      return ( <span>{value}</span> )
+  }else{
+      return ( <span>{value}</span> )
+  }
+}

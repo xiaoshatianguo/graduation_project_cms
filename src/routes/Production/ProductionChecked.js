@@ -21,6 +21,7 @@ import moment from 'moment';
 import PageHeaderLayout from '../../layouts/PageHeaderLayout';
 import UploadImgs from '../../components/UploadImgs/UploadImgs';
 import { qiniuDomain } from '../../utils/appConfig';
+import { TextToF } from '../../utils/utils';
 
 const FormItem = Form.Item;
 const { TextArea } = Input;
@@ -335,14 +336,11 @@ export class ProductionChecked extends Component {
         title: '作者',
         className: 'ant-tableThead',
         dataIndex: 'author',
-        width: 160,
-        fixed: 'left',
       },
       {
         title: '分类',
         className: 'ant-tableThead',
         dataIndex: 'sort',
-        width: 160,
         render: (text) => {
           return <span>{ this.state.categoriesList[text] }</span>;
         },
@@ -351,7 +349,6 @@ export class ProductionChecked extends Component {
         title: '作品',
         className: 'ant-tableThead',
         dataIndex: 'cover',
-        width: 80,
         render: (text) => {
           return <img src={text} style={{width:80}} />
         }
@@ -360,31 +357,28 @@ export class ProductionChecked extends Component {
         title: '简介',
         className: 'ant-tableThead',
         dataIndex: 'describe',
-        width: 160,
+        render: TextToF,
       },
       {
         title: '摄影道具',
         className: 'ant-tableThead',
         dataIndex: 'photography_props',
-        width: 160,
       },
       {
         title: '摄影地点',
         className: 'ant-tableThead',
         dataIndex: 'photography_site',
-        width: 160,
       },
       {
         title: '描述详情',
         className: 'ant-tableThead',
         dataIndex: 'content',
-        width: 160,
+        render: TextToF,
       },
       {
         title: '创建时间',
         className: 'ant-tableThead',
         dataIndex: 'create_time',
-        width: 160,
         render: (text) => {
           return <span>{ !!text ? moment(text).format('YYYY-MM-DD HH:mm:ss') : '-' }</span>;
         },
@@ -393,7 +387,7 @@ export class ProductionChecked extends Component {
         title: '操作',
         className: 'ant-tableThead',
         key: 'action',
-        width: 300,
+        width: 100,
         fixed: 'right',
         render: (text, record, index) => {
           const { id = -1 } = record;

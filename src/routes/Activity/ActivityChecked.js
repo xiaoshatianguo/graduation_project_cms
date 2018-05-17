@@ -22,6 +22,7 @@ import moment from 'moment';
 import PageHeaderLayout from '../../layouts/PageHeaderLayout';
 import UploadImgs from '../../components/UploadImgs/UploadImgs';
 import { qiniuDomain } from '../../utils/appConfig';
+import { TextToF } from '../../utils/utils';
 
 const FormItem = Form.Item;
 const { TextArea } = Input;
@@ -337,13 +338,6 @@ export class ActivityChecked extends Component {
     }
 
     const columns = [
-      // {
-      //   title: '编号',
-      //   className: 'ant-tableThead',
-      //   dataIndex: 'number',
-      //   width: 80,
-      //   fixed: 'left',
-      // },
       {
         title: '发起者',
         className: 'ant-tableThead',
@@ -355,13 +349,11 @@ export class ActivityChecked extends Component {
         title: '活动标题',
         className: 'ant-tableThead',
         dataIndex: 'name',
-        width: 100,
       },
       {
         title: '活动类别',
         className: 'ant-tableThead',
         dataIndex: 'sort',
-        width: 160,
         render: (text) => {
           return <span>{ this.state.categoriesList[text] }</span>;
         },
@@ -370,13 +362,11 @@ export class ActivityChecked extends Component {
         title: '活动主题',
         className: 'ant-tableThead',
         dataIndex: 'topic',
-        width: 200,
       },
       {
         title: '活动封面',
         className: 'ant-tableThead',
         dataIndex: 'cover',
-        width: 200,
         render: (text) => {
           return <img src={text} style={{width:80}} />
         }
@@ -385,7 +375,6 @@ export class ActivityChecked extends Component {
         title: '活动banner',
         className: 'ant-tableThead',
         dataIndex: 'banner',
-        width: 200,
         render: (text) => {
           return <img src={text} style={{width:80}} />
         }
@@ -394,25 +383,24 @@ export class ActivityChecked extends Component {
         title: '活动简介',
         className: 'ant-tableThead',
         dataIndex: 'describe',
-        width: 200,
+        render: TextToF
       },
       {
         title: '活动内容',
         className: 'ant-tableThead',
         dataIndex: 'content',
-        width: 200,
+        render: TextToF
       },
       {
         title: '活动规则',
         className: 'ant-tableThead',
         dataIndex: 'rule',
-        width: 200,
+        render: TextToF
       },
       {
         title: '开始时间',
         className: 'ant-tableThead',
         dataIndex: 'start_time',
-        width: 180,
         render: (text) => {
           return <span>{moment(text).format('YYYY-MM-DD HH:mm:ss')}</span>;
         },
@@ -421,7 +409,6 @@ export class ActivityChecked extends Component {
         title: '结束时间',
         className: 'ant-tableThead',
         dataIndex: 'end_time',
-        width: 180,
         render: (text) => {
           return <span>{moment(text).format('YYYY-MM-DD HH:mm:ss')}</span>;
         },
@@ -430,7 +417,6 @@ export class ActivityChecked extends Component {
         title: '创建时间',
         className: 'ant-tableThead',
         dataIndex: 'create_time',
-        width: 180,
         render: (text) => {
           return <span>{moment(text).format('YYYY-MM-DD HH:mm:ss')}</span>;
         },
@@ -439,7 +425,7 @@ export class ActivityChecked extends Component {
         title: '操作',
         className: 'ant-tableThead',
         key: 'action',
-        width: 300,
+        width: 150,
         fixed: 'right',
         render: (text, record, index) => {
           return (
@@ -566,7 +552,7 @@ export class ActivityChecked extends Component {
         <Row>
           <Table
             width={800}
-            scroll={{ x: 2480 }}
+            scroll={{ x: 2430 }}
             columns={columns}
             rowKey={record => record.id || 0}
             dataSource={this.state.tableData}
