@@ -3,9 +3,9 @@
  */
 
 import {
-    queryFormManage,
-    updateFormManage,
-    deleteFormManage,
+    queryComments,
+    updateComments,
+    deleteComments,
   } from '../services/comments';
   
 export default {
@@ -19,21 +19,21 @@ export default {
   
     effects: {
       *fetch({ payload }, { call, put }) {
-        const response = yield call(queryFormManage, payload);
+        const response = yield call(queryComments, payload);
         yield put({
           type: 'save',
           payload: response,
         });
       },
       *put({ payload }, { call, put }) {
-        const response = yield call(updateFormManage, payload);
+        const response = yield call(updateComments, payload);
         yield put({
           type: 'updete',
           payload: response,
         });
       },
       *delete({ payload }, { call }) {
-        yield call(deleteFormManage, payload);
+        yield call(deleteComments, payload);
       },
     },
   

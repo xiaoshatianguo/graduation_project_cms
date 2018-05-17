@@ -4,9 +4,9 @@ import { Row, Button, Table, Popconfirm, Form, message, Switch } from 'antd';
 import moment from 'moment';
 import PageHeaderLayout from '../../layouts/PageHeaderLayout';
 
-@connect(({ formManage, loading }) => ({
-  formManage,
-  loading: loading.models.formManage,
+@connect(({ comments, loading }) => ({
+  comments,
+  loading: loading.models.comments,
 }))
 @Form.create()
 export class Comments extends Component {
@@ -16,11 +16,8 @@ export class Comments extends Component {
     editFormTitle: '',
 
     id: '', // 表格数据
-    name: '',
-    phone: '',
-    company: '',
-    email: '',
-    info: '',
+    user_id: '',
+    content: '',
     creat_time: '',
     status: '',
 
@@ -34,7 +31,7 @@ export class Comments extends Component {
     const { currentPage, curPageSize } = this.state;
 
     this.props.dispatch({
-      type: 'formManage/fetch',
+      type: 'comments/fetch',
       payload: {
         currentPage,
         curPageSize,
@@ -43,7 +40,7 @@ export class Comments extends Component {
   };
 
   componentWillReceiveProps = (nextProps) => {
-    const { data } = nextProps.formManage;
+    const { data } = nextProps.comments;
     const { content = [], totalElements } = data;
 
     this.setState({ tableData: content, tableDataTotal: totalElements });
@@ -51,7 +48,7 @@ export class Comments extends Component {
 
   handleRowDeleteClick = async (id, index, record) => {
     await this.props.dispatch({
-      type: 'formManage/delete',
+      type: 'comments/delete',
       payload: {
         id,
       },
@@ -86,7 +83,7 @@ export class Comments extends Component {
     }
 
     await this.props.dispatch({
-      type: 'formManage/put',
+      type: 'comments/put',
       payload: {
         id: record.id,
         status: checked,
@@ -106,7 +103,7 @@ export class Comments extends Component {
     const { curPageSize } = this.state;
 
     this.props.dispatch({
-      type: 'formManage/fetch',
+      type: 'comments/fetch',
       payload: {
         currentPage: current,
         curPageSize,
@@ -119,39 +116,15 @@ export class Comments extends Component {
   render() {
     const columns = [
       {
-        title: '姓名',
+        title: '用户昵称',
         className: 'ant-tableThead',
-        dataIndex: 'name',
-        width: 100,
-      },
-      {
-        title: '联系方式',
-        className: 'ant-tableThead',
-        dataIndex: 'phone',
-        width: 150,
-      },
-      {
-        title: '公司名称',
-        className: 'ant-tableThead',
-        dataIndex: 'company',
-        width: 150,
-      },
-      {
-        title: '联系邮箱',
-        className: 'ant-tableThead',
-        dataIndex: 'email',
+        dataIndex: 'user_id',
         width: 200,
       },
       {
-        title: '问题描述',
+        title: '评论内容',
         className: 'ant-tableThead',
-        dataIndex: 'info',
-        width: 300,
-      },
-      {
-        title: '参考作品',
-        className: 'ant-tableThead',
-        dataIndex: 'reference',
+        dataIndex: 'content',
         width: 300,
       },
       {
@@ -160,7 +133,7 @@ export class Comments extends Component {
         dataIndex: 'create_time',
         width: 200,
         render: (text) => {
-          return <span>{moment(text).format('YYYY-MM-DD')}</span>;
+          return <span>{moment(text).format('YYYY-MM-DD hh:mm:ss')}</span>;
         },
       },
       {
@@ -174,15 +147,15 @@ export class Comments extends Component {
           return (
             <span>
               <Switch
-                checkedChildren="已联系"
-                unCheckedChildren="未联系"
+                checkedChildren="屏蔽"
+                unCheckedChildren="正常"
                 defaultChecked={record.status === 1}
                 onChange={checked => this.handleSetStatus(checked, record)}
               />
 
-              <span className="ant-divider" />
+              {/* <span className="ant-divider" /> */}
 
-              <Popconfirm
+              {/* <Popconfirm
                 title="确定要删除吗？"
                 placement="topRight"
                 onConfirm={() => this.handleRowDeleteClick(id, index, record)}
@@ -190,7 +163,7 @@ export class Comments extends Component {
                 <Button type="danger" icon="delete">
                   删除
                 </Button>
-              </Popconfirm>
+              </Popconfirm> */}
             </span>
           );
         },
@@ -221,7 +194,7 @@ export class Comments extends Component {
     const { modalVisible, editFormTitle, currentPage, curPageSize, tableDataTotal } = this.state;
 
     return (
-      <PageHeaderLayout title="表单管理" content="表单咨询页面所填写的表单提交内容的管理。">
+      <PageHeaderLayout title="评论留言管理" content="用户提交的评论留言管理">
         <Row>
           <Table
             columns={columns}

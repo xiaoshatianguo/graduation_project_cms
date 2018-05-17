@@ -78,16 +78,16 @@ const menuData = [
     name: '评论留言管理',
     icon: 'form',
     path: 'comments',
-    children: [
-      {
-        name: '评论管理',
-        path: 'comments',
-      },
-      {
-        name: '留言管理',
-        path: 'massage',
-      },
-    ],
+    // children: [
+    //   {
+    //     name: '评论管理',
+    //     path: 'comments',
+    //   },
+    //   {
+    //     name: '留言管理',
+    //     path: 'massage',
+    //   },
+    // ],
   }
 ];
 

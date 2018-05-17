@@ -115,12 +115,12 @@ export const getRouterData = (app) => {
     '/production-sort': {
       component: dynamicWrapper(app, ['productionSort'], () => import('../routes/ProductionSort/ProductionSort')),
     },
-    '/comments/comments': {
+    '/comments': {
       component: dynamicWrapper(app, ['comments'], () => import('../routes/Comments/Comments')),
     },
-    '/comments/massage': {
-      component: dynamicWrapper(app, ['comments'], () => import('../routes/Comments/Massage')),
-    }
+    // '/comments/massage': {
+    //   component: dynamicWrapper(app, ['comments'], () => import('../routes/Comments/Massage')),
+    // }
   };
 
   // Get name from ./menu.js or just set it in the router data.

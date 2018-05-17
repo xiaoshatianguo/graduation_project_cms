@@ -1,3 +1,4 @@
+// import { query as queryUsers } from '../services/user';
 import { query as queryUsers, queryCurrent } from '../services/user';
 
 export default {

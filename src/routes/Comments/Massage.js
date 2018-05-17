@@ -16,11 +16,8 @@ export class Message extends Component {
     editFormTitle: '',
 
     id: '', // 表格数据
-    name: '',
-    phone: '',
-    company: '',
-    email: '',
-    info: '',
+    user_id: '',
+    content: '',
     creat_time: '',
     status: '',
 
