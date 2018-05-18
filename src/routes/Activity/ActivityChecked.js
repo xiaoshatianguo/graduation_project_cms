@@ -304,17 +304,18 @@ export class ActivityChecked extends Component {
     }
 
     const columns = [
-      {
-        title: '发起者',
-        className: 'ant-tableThead',
-        dataIndex: 'initiator',
-        width: 100,
-        fixed: 'left',
-      },
+      // {
+      //   title: '发起者',
+      //   className: 'ant-tableThead',
+      //   dataIndex: 'initiator',
+      //   width: 100,
+      //   fixed: 'left',
+      // },
       {
         title: '活动标题',
         className: 'ant-tableThead',
         dataIndex: 'name',
+        fixed: 'left',
       },
       {
         title: '活动主题',
@@ -427,19 +428,11 @@ export class ActivityChecked extends Component {
         <Card>
           <Row className="lw-top-col" type="flex" align="middle" justify="space-between">
               <Form layout="inline">
-                  <FormItem label="活动发起人：">
-                      <Input
-                          name="searchInitiator"
-                          placeholder="请输入活动发起人"
-                          defaultValue={this.state.searchInitiator}
-                          onChange={this.handleInputChange}
-                      />
-                  </FormItem>
 
-                  <FormItem label="活动名称：">
+                  <FormItem label="活动标题：">
                       <Input
                           name="searchName"
-                          placeholder="请输入活动名称"
+                          placeholder="请输入活动标题"
                           defaultValue={this.state.searchName}
                           onChange={this.handleInputChange}
                       />
@@ -527,13 +520,6 @@ export class ActivityChecked extends Component {
           ]}
         >
           <Form onSubmit={this.handleSubmit} width={800}>
-            <FormItem {...formItemLayout} label="发起者">
-              {getFieldDecorator('initiator', {
-                rules: customRules,
-                initialValue: this.state.initiator,
-              })(<Input placeholder="请输入活动发起者" />)}
-            </FormItem>
-
             <FormItem {...formItemLayout} label="活动标题">
               {getFieldDecorator('name', {
                 rules: customRules,

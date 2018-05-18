@@ -518,9 +518,9 @@ export class CertifiedArchitectInfo extends Component {
               </FormItem>
 
               <FormItem>
-                <Button type="primary" icon="plus" onClick={() => this.handleModalVisible(true)}>
+                {/* <Button type="primary" icon="plus" onClick={() => this.handleModalVisible(true)}>
                   新增认证师
-                </Button>
+                </Button> */}
               </FormItem>
             </Form>
           </Row>
@@ -641,13 +641,6 @@ export class CertifiedArchitectInfo extends Component {
                 rules: customRules,
                 initialValue: this.state.address,
               })(<Input placeholder="请输入地址" />)}
-            </FormItem>
-
-            <FormItem {...formItemLayout} label="密码">
-              {getFieldDecorator('password', {
-                rules: customRules,
-                initialValue: this.state.password,
-              })(<Input placeholder="请输入密码" />)}
             </FormItem>
 
             <FormItem {...formItemLayout} label="积分">

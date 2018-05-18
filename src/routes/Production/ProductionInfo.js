@@ -96,7 +96,7 @@ export class ProductionInfo extends Component {
       for (var i = 0; i < categoriesData.length; i++) {
         categoriesObject[categoriesData[i].id] = categoriesData[i].name;
         categoriesArr.push({
-          key: categoriesData[i].number,
+          key: categoriesData[i].id,
           value: categoriesData[i].name,
         })
       }
@@ -360,11 +360,6 @@ export class ProductionInfo extends Component {
     }
 
     const columns = [
-      // {
-      //   title: '编号',
-      //   className: 'ant-tableThead',
-      //   dataIndex: 'number',
-      // },
       {
         title: '作品名称',
         className: 'ant-tableThead',
@@ -372,11 +367,11 @@ export class ProductionInfo extends Component {
         width: 160,
         fixed: 'left',
       },
-      {
-        title: '作者',
-        className: 'ant-tableThead',
-        dataIndex: 'author_id',
-      },
+      // {
+      //   title: '作者',
+      //   className: 'ant-tableThead',
+      //   dataIndex: 'author_id',
+      // },
       {
         title: '分类',
         className: 'ant-tableThead',
@@ -499,22 +494,13 @@ export class ProductionInfo extends Component {
                       />
                   </FormItem>
 
-                  <FormItem label="作品作者：">
-                      <Input
-                          name="searchAuthor"
-                          placeholder="请输入作品作者"
-                          defaultValue={this.state.searchAuthor}
-                          onChange={this.handleInputChange}
-                      />
-                  </FormItem>
-
                   <FormItem label="作品类别：">
                     <Select
                         allowClear={true}
-                        placeholder="选择管理员类别"
+                        placeholder="选择作品类别"
                         style={{ width: 150}}
                         onChange={(value) => {
-                            this.setState({searchCategories: value});
+                            this.setState({searchSort: value});
                         }}
                     >
                       { categoriesOption }
@@ -616,13 +602,6 @@ export class ProductionInfo extends Component {
               {getFieldDecorator('name', {
                 rules: customRules,
                 initialValue: this.state.name,
-              })(<Input />)}
-            </FormItem>
-
-            <FormItem {...formItemLayout} label="作者">
-              {getFieldDecorator('author_id', {
-                rules: customRules,
-                initialValue: this.state.author_id,
               })(<Input />)}
             </FormItem>
 

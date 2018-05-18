@@ -70,12 +70,12 @@ export class Comments extends Component {
     switch (checked) {
       case true:
         checked = 1 * 1;
-        message = '该客户标记为已联系 ☎';
+        message = '该评论已屏蔽';
         break;
 
       case false:
         checked = 0 * 1;
-        message = '该客户标记为未联系 ≯(๑° . °๑)≮';
+        message = '解除屏蔽';
         break;
 
       default:

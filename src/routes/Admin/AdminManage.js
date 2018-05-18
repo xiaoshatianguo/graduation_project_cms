@@ -330,6 +330,7 @@ export class AdminManage extends Component {
         categoriesOption.push(<Option key={item.key} value={item.key}>{item.value}</Option>)
       })
     }
+    console.log(categoriesOption);
 
     const columns = [
       // {
@@ -487,7 +488,7 @@ export class AdminManage extends Component {
                     </Select>
                   </FormItem>
 
-                  <FormItem label="管理员权限：">
+                  <FormItem label="管理员类别：">
                     <Select
                         allowClear={true}
                         placeholder="选择管理员类别"
