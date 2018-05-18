@@ -22,15 +22,16 @@ import moment from 'moment';
 import PageHeaderLayout from '../../layouts/PageHeaderLayout';
 import UploadImgs from '../../components/UploadImgs/UploadImgs';
 import { qiniuDomain } from '../../utils/appConfig';
+import { TextToF } from '../../utils/utils';
 
 const FormItem = Form.Item;
 const { TextArea } = Input;
 const Option = Select.Option;
 const { RangePicker } = DatePicker;
 
-@connect(({ activity, loading, productionSort }) => ({
+@connect(({ activity, loading }) => ({
   activity,
-  productionSort,
+  // productionSort,
   loading: loading.models.activity,
 }))
 
@@ -57,9 +58,6 @@ export class ActivityInfo extends Component {
     auditor: '',
     disabled: '',
 
-    categoriesList: {},
-    categoriesArr: [],
-
     searchInitiator: '',
     searchName: '',
     searchSort: '',
@@ -81,40 +79,20 @@ export class ActivityInfo extends Component {
         status: '0',
       },
     });
-
-    this.props.dispatch({
-      type: 'productionSort/fetch',
-    });
   };
 
   componentWillReceiveProps = (nextProps) => {
     const { data } = nextProps.activity;
     const { content = [], totalElements } = data;
 
-    // 获取分类对象进行处理、以及处理分类成数组
-    const categoriesData = nextProps.productionSort.data.content;
-    let categoriesObject = {};
-    let categoriesArr =[];
-    if(!!categoriesData) {
-      for (var i = 0; i < categoriesData.length; i++) {
-        categoriesObject[categoriesData[i].number] = categoriesData[i].name;
-        categoriesArr.push({
-          key: categoriesData[i].number,
-          value: categoriesData[i].name,
-        })
-      }
-    }
-
-    this.setState({ tableData: content, tableDataTotal: totalElements, categoriesList: categoriesObject, categoriesArr });
+    this.setState({ tableData: content, tableDataTotal: totalElements,});
   };
 
   handleRowEditClick = (index, record) => {
     let {
       id = -1,
-      // number,
       name,
       initiator,
-      sort,
       topic,
       describe,
       content,
@@ -128,8 +106,6 @@ export class ActivityInfo extends Component {
     } = record;
     this.tableCurIndex = index;
 
-    sort += '';
-    
     this.setState({
       id,
       modalVisible: true,
@@ -139,10 +115,8 @@ export class ActivityInfo extends Component {
     });
 
     this.props.form.setFieldsValue({
-      // number,
       name,
       initiator,
-      sort,
       topic,
       describe,
       content,
@@ -337,7 +311,6 @@ export class ActivityInfo extends Component {
         curPageSize,
         initiator: searchInitiator,
         name: searchName,
-        sort: searchSort,
         status: '0',
       },
     });
@@ -358,22 +331,7 @@ export class ActivityInfo extends Component {
   }
 
   render() {
-    let categoriesOption =[];
-    
-    if(!!this.state.categoriesArr) {
-      this.state.categoriesArr.map((item, index)=>{
-        categoriesOption.push(<Option key={item.key} value={item.key}>{item.value}</Option>)
-      })
-    }
-
     const columns = [
-      // {
-      //   title: '编号',
-      //   className: 'ant-tableThead',
-      //   dataIndex: 'number',
-      //   width: 80,
-      //   fixed: 'left',
-      // },
       {
         title: '发起者',
         className: 'ant-tableThead',
@@ -385,28 +343,16 @@ export class ActivityInfo extends Component {
         title: '活动标题',
         className: 'ant-tableThead',
         dataIndex: 'name',
-        width: 100,
-      },
-      {
-        title: '活动类别',
-        className: 'ant-tableThead',
-        dataIndex: 'sort',
-        width: 160,
-        render: (text) => {
-          return <span>{ this.state.categoriesList[text] }</span>;
-        },
       },
       {
         title: '活动主题',
         className: 'ant-tableThead',
         dataIndex: 'topic',
-        width: 200,
       },
       {
         title: '活动封面',
         className: 'ant-tableThead',
         dataIndex: 'cover',
-        width: 200,
         render: (text) => {
           return <img src={text} style={{width:80}} />
         }
@@ -415,7 +361,6 @@ export class ActivityInfo extends Component {
         title: '活动banner',
         className: 'ant-tableThead',
         dataIndex: 'banner',
-        width: 200,
         render: (text) => {
           return <img src={text} style={{width:80}} />
         }
@@ -424,25 +369,24 @@ export class ActivityInfo extends Component {
         title: '活动简介',
         className: 'ant-tableThead',
         dataIndex: 'describe',
-        width: 200,
+        render: TextToF
       },
       {
         title: '活动内容',
         className: 'ant-tableThead',
         dataIndex: 'content',
-        width: 200,
+        render: TextToF
       },
       {
         title: '活动规则',
         className: 'ant-tableThead',
         dataIndex: 'rule',
-        width: 200,
+        render: TextToF
       },
       {
         title: '开始时间',
         className: 'ant-tableThead',
         dataIndex: 'start_time',
-        width: 180,
         render: (text) => {
           return <span>{moment(text).format('YYYY-MM-DD HH:mm:ss')}</span>;
         },
@@ -451,7 +395,6 @@ export class ActivityInfo extends Component {
         title: '结束时间',
         className: 'ant-tableThead',
         dataIndex: 'end_time',
-        width: 180,
         render: (text) => {
           return <span>{moment(text).format('YYYY-MM-DD HH:mm:ss')}</span>;
         },
@@ -460,7 +403,6 @@ export class ActivityInfo extends Component {
         title: '创建时间',
         className: 'ant-tableThead',
         dataIndex: 'create_time',
-        width: 180,
         render: (text) => {
           return <span>{moment(text).format('YYYY-MM-DD HH:mm:ss')}</span>;
         },
@@ -554,19 +496,6 @@ export class ActivityInfo extends Component {
                   />
               </FormItem>
 
-              <FormItem label="活动类别：">
-                <Select
-                    allowClear={true}
-                    placeholder="选择活动类别"
-                    style={{ width: 150}}
-                    onChange={(value) => {
-                        this.setState({searchSort: value});
-                    }}
-                >
-                  { categoriesOption }
-                </Select>
-              </FormItem>
-
               <FormItem>
                   <Button icon="search" type="primary" onClick={this.handleSearchSubmit} htmlType="submit">查询</Button>
               </FormItem>
@@ -649,13 +578,6 @@ export class ActivityInfo extends Component {
           onCancel={() => this.handleModalVisible(false)}
         >
           <Form onSubmit={this.handleSubmit} width={800}>
-            {/* <FormItem {...formItemLayout} label="活动编号">
-              {getFieldDecorator('number', {
-                rules: customRules,
-                initialValue: this.state.number,
-              })(<Input placeholder="请输入活动编号" />)}
-            </FormItem> */}
-
             <FormItem {...formItemLayout} label="发起者">
               {getFieldDecorator('initiator', {
                 rules: customRules,
@@ -668,17 +590,6 @@ export class ActivityInfo extends Component {
                 rules: customRules,
                 initialValue: this.state.name,
               })(<Input placeholder="请输入活动标题" />)}
-            </FormItem>
-
-            <FormItem {...formItemLayout} label="类别">
-              {getFieldDecorator('sort', {
-                rules: customRules,
-                initialValue: this.state.sort,
-              })(
-                <Select>
-                  { categoriesOption }
-                </Select>
-              )}
             </FormItem>
 
             <FormItem {...formItemLayout} label="主题">
@@ -720,7 +631,7 @@ export class ActivityInfo extends Component {
                 initialValue: this.state.describe,
               })(
                 <TextArea
-                  placeholder="请录入 MarkDown 格式的活动简介"
+                  placeholder="请录入活动简介"
                   autosize={{ minRows: 6, maxRows: 20 }}
                 />
               )}
@@ -732,7 +643,7 @@ export class ActivityInfo extends Component {
                 initialValue: this.state.content,
               })(
                 <TextArea
-                  placeholder="请录入 MarkDown 格式的活动内容"
+                  placeholder="请录入活动内容"
                   autosize={{ minRows: 6, maxRows: 20 }}
                 />
               )}
@@ -744,7 +655,7 @@ export class ActivityInfo extends Component {
                 initialValue: this.state.rule,
               })(
                 <TextArea
-                  placeholder="请录入 MarkDown 格式的活动规则"
+                  placeholder="请录入活动规则"
                   autosize={{ minRows: 6, maxRows: 20 }}
                 />
               )}

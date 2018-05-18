@@ -3,7 +3,7 @@
  */
 
 /* 程序调用接口的前缀 */
-export const apiPrefix = 'http://127.0.0.1:7001';
+export const apiPrefix = 'http://127.0.0.1:7002';
 // export const apiPrefix = 'http://sy.hndjfs.com';
 
 /* 异步请求接口超时的时长，以秒作为单位 */

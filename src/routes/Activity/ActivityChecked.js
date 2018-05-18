@@ -29,9 +29,8 @@ const { TextArea } = Input;
 const Option = Select.Option;
 const { RangePicker } = DatePicker;
 
-@connect(({ activity, loading, productionSort }) => ({
+@connect(({ activity, loading }) => ({
   activity,
-  productionSort,
   loading: loading.models.activity,
 }))
 
@@ -43,10 +42,8 @@ export class ActivityChecked extends Component {
     modalVisible: false,
     editFormTitle: '',
 
-    // number: '',
     name: '',
     initiator: '',
-    sort: '',
     topic: '',
     describe: '',
     content: '',
@@ -57,9 +54,6 @@ export class ActivityChecked extends Component {
     end_time: '',
     status: '',
     auditor: '',
-
-    categoriesList: {},
-    categoriesArr: [],
 
     searchInitiator: '',
     searchName: '',
@@ -82,40 +76,20 @@ export class ActivityChecked extends Component {
         status: '1',
       },
     });
-
-    this.props.dispatch({
-      type: 'productionSort/fetch',
-    });
   };
 
   componentWillReceiveProps = (nextProps) => {
     const { data } = nextProps.activity;
     const { content = [], totalElements } = data;
 
-    // 获取分类对象进行处理、以及处理分类成数组
-    const categoriesData = nextProps.productionSort.data.content;
-    let categoriesObject = {};
-    let categoriesArr =[];
-    if(!!categoriesData) {
-      for (var i = 0; i < categoriesData.length; i++) {
-        categoriesObject[categoriesData[i].number] = categoriesData[i].name;
-        categoriesArr.push({
-          key: categoriesData[i].number,
-          value: categoriesData[i].name,
-        })
-      }
-    }
-
-    this.setState({ tableData: content, tableDataTotal: totalElements, categoriesList: categoriesObject, categoriesArr });
+    this.setState({ tableData: content, tableDataTotal: totalElements });
   };
 
   handleRowEditClick = (index, record) => {
     let {
       id = -1,
-      // number,
       name,
       initiator,
-      sort,
       topic,
       describe,
       content,
@@ -130,8 +104,6 @@ export class ActivityChecked extends Component {
 
     this.tableCurIndex = index;
     
-    sort += '';
-
     this.setState({
       id,
       modalVisible: true,
@@ -141,10 +113,8 @@ export class ActivityChecked extends Component {
     });
 
     this.props.form.setFieldsValue({
-      // number,
       name,
       initiator,
-      sort,
       topic,
       describe,
       content,
@@ -159,10 +129,8 @@ export class ActivityChecked extends Component {
   handleAudit= async (index, record) => {
     let { 
       id = -1,
-      // number,
       name,
       initiator,
-      sort,
       topic,
       describe,
       content,
@@ -185,10 +153,8 @@ export class ActivityChecked extends Component {
     });
 
     this.props.form.setFieldsValue({
-      // number,
       name,
       initiator,
-      sort,
       topic,
       describe,
       content,
@@ -351,14 +317,6 @@ export class ActivityChecked extends Component {
         dataIndex: 'name',
       },
       {
-        title: '活动类别',
-        className: 'ant-tableThead',
-        dataIndex: 'sort',
-        render: (text) => {
-          return <span>{ this.state.categoriesList[text] }</span>;
-        },
-      },
-      {
         title: '活动主题',
         className: 'ant-tableThead',
         dataIndex: 'topic',
@@ -487,19 +445,6 @@ export class ActivityChecked extends Component {
                       />
                   </FormItem>
 
-                  <FormItem label="活动类别：">
-                    <Select
-                        allowClear={true}
-                        placeholder="选择活动类别"
-                        style={{ width: 150}}
-                        onChange={(value) => {
-                            this.setState({searchSort: value});
-                        }}
-                    >
-                      { categoriesOption }
-                    </Select>
-                  </FormItem>
-
                   <FormItem>
                       <Button icon="search" type="primary" onClick={this.handleSearchSubmit} htmlType="submit">查询</Button>
                   </FormItem>
@@ -582,13 +527,6 @@ export class ActivityChecked extends Component {
           ]}
         >
           <Form onSubmit={this.handleSubmit} width={800}>
-            {/* <FormItem {...formItemLayout} label="活动编号">
-              {getFieldDecorator('number', {
-                rules: customRules,
-                initialValue: this.state.number,
-              })(<Input placeholder="请输入活动编号" />)}
-            </FormItem> */}
-
             <FormItem {...formItemLayout} label="发起者">
               {getFieldDecorator('initiator', {
                 rules: customRules,
@@ -601,17 +539,6 @@ export class ActivityChecked extends Component {
                 rules: customRules,
                 initialValue: this.state.name,
               })(<Input placeholder="请输入活动标题" />)}
-            </FormItem>
-
-            <FormItem {...formItemLayout} label="类别">
-              {getFieldDecorator('sort', {
-                rules: customRules,
-                initialValue: this.state.sort,
-              })(
-                <Select>
-                  { categoriesOption }
-                </Select>
-              )}
             </FormItem>
 
             <FormItem {...formItemLayout} label="主题">
@@ -653,7 +580,7 @@ export class ActivityChecked extends Component {
                 initialValue: this.state.describe,
               })(
                 <TextArea
-                  placeholder="请录入 MarkDown 格式的活动简介"
+                  placeholder="请录入活动简介"
                   autosize={{ minRows: 6, maxRows: 20 }}
                 />
               )}
@@ -665,7 +592,7 @@ export class ActivityChecked extends Component {
                 initialValue: this.state.content,
               })(
                 <TextArea
-                  placeholder="请录入 MarkDown 格式的活动内容"
+                  placeholder="请录入活动内容"
                   autosize={{ minRows: 6, maxRows: 20 }}
                 />
               )}
@@ -677,7 +604,7 @@ export class ActivityChecked extends Component {
                 initialValue: this.state.rule,
               })(
                 <TextArea
-                  placeholder="请录入 MarkDown 格式的活动规则"
+                  placeholder="请录入活动规则"
                   autosize={{ minRows: 6, maxRows: 20 }}
                 />
               )}

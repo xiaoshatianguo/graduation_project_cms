@@ -40,9 +40,8 @@ export class ProductionChecked extends Component {
     modalVisible: false,
     editFormTitle: '',
 
-    // number: '',
     name: '',
-    author: '',
+    author_id: '',
     sort: '',
     cover: '',
     describe: '',
@@ -93,7 +92,7 @@ export class ProductionChecked extends Component {
     let categoriesArr =[];
     if(!!categoriesData) {
       for (var i = 0; i < categoriesData.length; i++) {
-        categoriesObject[categoriesData[i].number] = categoriesData[i].name;
+        categoriesObject[categoriesData[i].id] = categoriesData[i].name;
         categoriesArr.push({
           key: categoriesData[i].number,
           value: categoriesData[i].name,
@@ -107,9 +106,8 @@ export class ProductionChecked extends Component {
   handleRowEditClick = (index, record) => {
     let {
       id = -1,
-      // number,
       name,
-      author,
+      author_id,
       sort,
       cover,
       describe,
@@ -131,9 +129,8 @@ export class ProductionChecked extends Component {
     });
 
     this.props.form.setFieldsValue({
-      // number,
       name,
-      author,
+      author_id,
       sort,
       cover,
       describe,
@@ -146,9 +143,8 @@ export class ProductionChecked extends Component {
   handleAudit= async (index, record) => {
     let { 
       id = -1,
-      // number,
       name,
-      author,
+      author_id,
       sort,
       cover,
       describe,
@@ -167,9 +163,8 @@ export class ProductionChecked extends Component {
     });
 
     this.props.form.setFieldsValue({
-      // number,
       name,
-      author,
+      author_id,
       sort,
       cover,
       describe,
@@ -291,9 +286,8 @@ export class ProductionChecked extends Component {
       payload: {
         currentPage,
         curPageSize,
-        // number: searchNumber,
         name: searchName,
-        author: searchAuthor,
+        author_id: searchAuthor,
         sort: searchSort,
         status: 1,
       },
@@ -320,11 +314,6 @@ export class ProductionChecked extends Component {
     }
 
     const columns = [
-      // {
-      //   title: '编号',
-      //   className: 'ant-tableThead',
-      //   dataIndex: 'number',
-      // },
       {
         title: '作品名称',
         className: 'ant-tableThead',
@@ -335,7 +324,7 @@ export class ProductionChecked extends Component {
       {
         title: '作者',
         className: 'ant-tableThead',
-        dataIndex: 'author',
+        dataIndex: 'author_id',
       },
       {
         title: '分类',
@@ -551,13 +540,6 @@ export class ProductionChecked extends Component {
           ]}
         >
           <Form onSubmit={this.handleSubmit} width={800}>
-            {/* <FormItem {...formItemLayout} label="编号">
-              {getFieldDecorator('number', {
-                rules: customRules,
-                initialValue: this.state.number,
-              })(<Input />)}
-            </FormItem> */}
-
             <FormItem {...formItemLayout} label="作品标题">
               {getFieldDecorator('name', {
                 rules: customRules,
@@ -566,9 +548,9 @@ export class ProductionChecked extends Component {
             </FormItem>
 
             <FormItem {...formItemLayout} label="作者">
-              {getFieldDecorator('author', {
+              {getFieldDecorator('author_id', {
                 rules: customRules,
-                initialValue: this.state.author,
+                initialValue: this.state.author_id,
               })(<Input />)}
             </FormItem>
 
@@ -583,13 +565,6 @@ export class ProductionChecked extends Component {
               {getFieldDecorator('content', {
                 rules: customRules,
                 initialValue: this.state.content,
-              })(<Input />)}
-            </FormItem>
-
-            <FormItem {...formItemLayout} label="分类">
-              {getFieldDecorator('sort', {
-                rules: customRules,
-                initialValue: this.state.sort,
               })(<Input />)}
             </FormItem>
           </Form>

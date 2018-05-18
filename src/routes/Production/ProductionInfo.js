@@ -41,7 +41,7 @@ export class ProductionInfo extends Component {
 
     // number: '',
     name: '',
-    author: '',
+    author_id: '',
     sort: '',
     cover: '',
     describe: '',
@@ -96,7 +96,7 @@ export class ProductionInfo extends Component {
       for (var i = 0; i < categoriesData.length; i++) {
         categoriesObject[categoriesData[i].id] = categoriesData[i].name;
         categoriesArr.push({
-          key: categoriesData[i].id,
+          key: categoriesData[i].number,
           value: categoriesData[i].name,
         })
       }
@@ -110,7 +110,7 @@ export class ProductionInfo extends Component {
       id = -1,
       // number,
       name,
-      author,
+      author_id,
       sort,
       cover,
       describe,
@@ -146,7 +146,7 @@ export class ProductionInfo extends Component {
     this.props.form.setFieldsValue({
       // number,
       name,
-      author,
+      author_id,
       sort,
       cover,
       describe,
@@ -333,7 +333,7 @@ export class ProductionInfo extends Component {
         curPageSize,
         // number: searchNumber,
         name: searchName,
-        author: searchAuthor,
+        author_id: searchAuthor,
         sort: searchSort,
         status: 0,
       },
@@ -375,7 +375,7 @@ export class ProductionInfo extends Component {
       {
         title: '作者',
         className: 'ant-tableThead',
-        dataIndex: 'author',
+        dataIndex: 'author_id',
       },
       {
         title: '分类',
@@ -425,7 +425,7 @@ export class ProductionInfo extends Component {
         title: '操作',
         className: 'ant-tableThead',
         key: 'action',
-        width: 150,
+        width: 300,
         fixed: 'right',
         render: (text, record, index) => {
           const { id = -1 } = record;
@@ -526,9 +526,9 @@ export class ProductionInfo extends Component {
                   </FormItem>
 
                   <FormItem>
-                    <Button type="primary" icon="plus" onClick={() => this.handleModalVisible(true)}>
+                    {/* <Button type="primary" icon="plus" onClick={() => this.handleModalVisible(true)}>
                     新增作品
-                  </Button>
+                  </Button> */}
                   </FormItem>
               </Form>
           </Row>
@@ -612,13 +612,6 @@ export class ProductionInfo extends Component {
           onCancel={() => this.handleModalVisible(false)}
         >
           <Form onSubmit={this.handleSubmit} width={800}>
-            {/* <FormItem {...formItemLayout} label="编号">
-              {getFieldDecorator('number', {
-                rules: customRules,
-                initialValue: this.state.number,
-              })(<Input />)}
-            </FormItem> */}
-
             <FormItem {...formItemLayout} label="作品标题">
               {getFieldDecorator('name', {
                 rules: customRules,
@@ -627,9 +620,9 @@ export class ProductionInfo extends Component {
             </FormItem>
 
             <FormItem {...formItemLayout} label="作者">
-              {getFieldDecorator('author', {
+              {getFieldDecorator('author_id', {
                 rules: customRules,
-                initialValue: this.state.author,
+                initialValue: this.state.author_id,
               })(<Input />)}
             </FormItem>
 
