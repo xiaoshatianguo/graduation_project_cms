@@ -21,6 +21,7 @@ import moment from 'moment';
 import PageHeaderLayout from '../../layouts/PageHeaderLayout';
 import UploadImgs from '../../components/UploadImgs/UploadImgs';
 import { qiniuDomain } from '../../utils/appConfig';
+import { TextToF } from '../../utils/utils';
 
 const FormItem = Form.Item;
 const { TextArea } = Input;
@@ -392,6 +393,7 @@ export class ProductionInfo extends Component {
         title: '简介',
         className: 'ant-tableThead',
         dataIndex: 'describe',
+        render: TextToF,
       },
       {
         title: '摄影道具',
@@ -407,6 +409,7 @@ export class ProductionInfo extends Component {
         title: '描述详情',
         className: 'ant-tableThead',
         dataIndex: 'content',
+        render: TextToF,
       },
       {
         title: '创建时间',

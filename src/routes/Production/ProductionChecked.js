@@ -141,6 +141,7 @@ export class ProductionChecked extends Component {
   };
 
   handleAudit= async (index, record) => {
+    console.log(record);
     let { 
       id = -1,
       name,
@@ -164,12 +165,12 @@ export class ProductionChecked extends Component {
 
     this.props.form.setFieldsValue({
       name,
-      author_id,
-      sort,
-      cover,
+      // author_id,
+      // sort,
+      // cover,
       describe,
-      photography_props,
-      photography_site,
+      // photography_props,
+      // photography_site,
       content,
     });
   }
