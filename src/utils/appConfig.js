@@ -3,9 +3,9 @@
  */
 
 /* 程序调用接口的前缀 */
-// export const apiPrefix = 'http://127.0.0.1:7001';
-export const apiPrefix = 'http://sy.hndjfs.com';
-// export const apiPrefix = 'http://119.23.61.80';
+export const apiPrefix = 'http://127.0.0.1:7001';
+// export const apiPrefix = 'http://sy.hndjfs.com';
+// export const apiPrefix = 'http://119.23.61.80:9001';
 
 /* 异步请求接口超时的时长，以秒作为单位 */
 export const timeout = '30';

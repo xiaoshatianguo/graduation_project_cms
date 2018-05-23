@@ -11,12 +11,12 @@ const menuData = [
       },
     ],
   },
-  {
-    name: '管理员',
-    icon: 'user',
-    path: 'admin',
-    authority: 'admin',
-  },
+  // {
+  //   name: '管理员',
+  //   icon: 'user',
+  //   path: 'admin',
+  //   authority: 'admin',
+  // },
   {
     name: '活动管理',
     icon: 'bulb',
